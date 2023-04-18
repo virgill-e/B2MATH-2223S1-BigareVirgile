@@ -16,7 +16,7 @@ public class LexicographicTreeTest {
 	private static final LexicographicTree DICT = new LexicographicTree();
 
 	@BeforeAll
-	private static void initTestDictionary() {
+	public static void initTestDictionary() {
 		for (int i=0; i<WORDS.length; i++) {
 			DICT.insertWord(WORDS[i]);
 		}

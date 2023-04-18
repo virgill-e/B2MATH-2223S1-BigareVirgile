@@ -1,12 +1,14 @@
 package tree;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
 
 public class LexicographicTree {
-	
+	private Node start;
+	private int size;
 	/*
 	 * CONSTRUCTORS
 	 */
@@ -15,7 +17,7 @@ public class LexicographicTree {
 	 * Constructor : creates an empty lexicographic tree.
 	 */
 	public LexicographicTree() {
-		// TODO
+		this(null);
 	}
 	
 	/**
@@ -23,7 +25,11 @@ public class LexicographicTree {
 	 * @param filename A text file containing the words to be inserted in the tree 
 	 */
 	public LexicographicTree(String filename) {
-		// TODO
+		start=new Node('\0');
+		size=0;
+		if(filename!=null) {
+			//TODO: lire le fichier
+		}
 	}
 	
 	/*
@@ -35,7 +41,7 @@ public class LexicographicTree {
 	 * @return The number of words present in the lexicographic tree
 	 */
 	public int size() {
-		return 0; // TODO
+		return this.size;
 	}
 
 	/**
@@ -43,7 +49,20 @@ public class LexicographicTree {
 	 * @param word A word
 	 */
 	public void insertWord(String word) {
-		// TODO
+		//TODO: verifie si le mot est deja dans la liste avant
+		if(containsWord(word)) return;
+		Node actualNode=start;
+		for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            Node child = actualNode.getChild(c);
+            if (child == null) { // si le noeud enfant n'existe pas on le crée
+                child = new Node(c);
+                actualNode.addChild(child);
+            }
+            actualNode = child; // on descend dans l'arbre
+        }
+		actualNode.setFinal(true);
+		this.size++;
 	}
 	
 	/**
@@ -52,7 +71,17 @@ public class LexicographicTree {
 	 * @return True if the word is present, false otherwise
 	 */
 	public boolean containsWord(String word) {
-		return true; // TODO
+		if(word.isBlank())return false;
+		Node actualNode=start;
+		for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            Node child = actualNode.getChild(c);
+            if (child == null) { // si le noeud enfant n'existe pas on renvoie false
+                return false;
+            }
+            actualNode = child; // on descend dans l'arbre
+        }
+		return actualNode.isFinal(); // TODO: parcourir les lettes si mot existe pas return false :)
 	}
 	
 	/**
@@ -194,7 +223,7 @@ public class LexicographicTree {
 	
 	public static void main(String[] args) {
 		// CTT : test de performance insertion/recherche
-		testDictionaryPerformance("mots/dictionnaire_FR_sans_accents.txt");
+		//testDictionaryPerformance("mots/dictionnaire_FR_sans_accents.txt");
 		
 		// CST : test de taille maximale si VM -Xms2048m -Xmx2048m
 		testDictionarySize();
