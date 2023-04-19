@@ -3,6 +3,7 @@ package tree;
 import java.io.File;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -49,7 +50,6 @@ public class LexicographicTree {
 	 * @param word A word
 	 */
 	public void insertWord(String word) {
-		//TODO: verifie si le mot est deja dans la liste avant
 		if(containsWord(word)) return;
 		Node actualNode=start;
 		for (int i = 0; i < word.length(); i++) {
@@ -81,7 +81,7 @@ public class LexicographicTree {
             }
             actualNode = child; // on descend dans l'arbre
         }
-		return actualNode.isFinal(); // TODO: parcourir les lettes si mot existe pas return false :)
+		return actualNode.isFinal();
 	}
 	
 	/**
@@ -91,7 +91,19 @@ public class LexicographicTree {
 	 * @return The list of words starting with the supplied prefix
 	 */
 	public List<String> getWords(String prefix) {
-		return null; // TODO
+		List<String> words = new ArrayList<>();
+	    Node actualNode = start;
+	    for (int i = 0; i < prefix.length(); i++) {
+	        char c = prefix.charAt(i);
+	        Node child = actualNode.getChild(c);
+	        if (child == null) {
+	            return words;
+	        }
+	        actualNode = child;
+	    }
+	    //TODO: fin de vérification du prefix recupéré tout les mot suivant
+	    //lorsque final ajout dans words
+	    return words;
 	}
 
 	/**
