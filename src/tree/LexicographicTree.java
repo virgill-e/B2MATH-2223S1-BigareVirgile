@@ -50,18 +50,8 @@ public class LexicographicTree {
 	 * @param word A word
 	 */
 	public void insertWord(String word) {
-		if(containsWord(word)) return;
-		Node actualNode=start;
-		for (int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
-            Node child = actualNode.getChild(c);
-            if (child == null) { // si le noeud enfant n'existe pas on le crée
-                child = new Node(c);
-                actualNode.addChild(child);
-            }
-            actualNode = child; // on descend dans l'arbre
-        }
-		actualNode.setFinal(true);
+		if(this.containsWord(word))return;
+		this.start.addWord(word);
 		this.size++;
 	}
 	
@@ -71,17 +61,7 @@ public class LexicographicTree {
 	 * @return True if the word is present, false otherwise
 	 */
 	public boolean containsWord(String word) {
-		if(word.isBlank())return false;
-		Node actualNode=start;
-		for (int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
-            Node child = actualNode.getChild(c);
-            if (child == null) { // si le noeud enfant n'existe pas on renvoie false
-                return false;
-            }
-            actualNode = child; // on descend dans l'arbre
-        }
-		return actualNode.isFinal();
+		return this.start.containsWord(word);
 	}
 	
 	/**
@@ -91,19 +71,7 @@ public class LexicographicTree {
 	 * @return The list of words starting with the supplied prefix
 	 */
 	public List<String> getWords(String prefix) {
-		List<String> words = new ArrayList<>();
-	    Node actualNode = start;
-	    for (int i = 0; i < prefix.length(); i++) {
-	        char c = prefix.charAt(i);
-	        Node child = actualNode.getChild(c);
-	        if (child == null) {
-	            return words;
-	        }
-	        actualNode = child;
-	    }
-	    //TODO: fin de vérification du prefix recupéré tout les mot suivant
-	    //lorsque final ajout dans words
-	    return words;
+		return null;
 	}
 
 	/**
@@ -113,7 +81,7 @@ public class LexicographicTree {
 	 * @return The list of words with the given length
 	 */
 	public List<String> getWordsOfLength(int length) {
-		return null; // TODO
+		return null;
 	}
 
 	/*
