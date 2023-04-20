@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.StringJoiner;
 
 public class Node implements Comparable<Node>{
 	private final char letter;
@@ -27,6 +28,10 @@ public class Node implements Comparable<Node>{
 		return this.isFinal;
 	}
 	
+	public List<Node> getChilds(){
+			return childs;
+	}
+	
 	public void setFinal() {
 		this.isFinal=true;
 	}
@@ -38,6 +43,7 @@ public class Node implements Comparable<Node>{
 		}
 		return null;
 	}
+	
 
 	public void addChild(char c) {
 		if(childs.contains(new Node(c)))return;
@@ -79,6 +85,8 @@ public class Node implements Comparable<Node>{
 	        return child.containsWord(word.substring(1));
 	    }
 	}
+
+	
 	
 
 	
@@ -86,6 +94,7 @@ public class Node implements Comparable<Node>{
 	public int compareTo(Node o) {
 		return Character.valueOf(o.getLetter()).compareTo(this.getLetter());
 	}
+
 	
 	
 }

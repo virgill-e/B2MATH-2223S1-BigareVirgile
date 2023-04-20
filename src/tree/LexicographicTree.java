@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 public class LexicographicTree {
 	private Node start;
@@ -71,7 +72,32 @@ public class LexicographicTree {
 	 * @return The list of words starting with the supplied prefix
 	 */
 	public List<String> getWords(String prefix) {
-		return null;
+		List<String> words =new ArrayList<>();
+		Node node=getNodePrefix(prefix);
+		getAllWord(node, words,prefix);
+		return words;
+	}
+	
+	private Node getNodePrefix(String prefix) {
+		Node node=this.start;
+		for(int i=0;i<prefix.length();i++) {
+			node=node.getChild(prefix.charAt(i));
+			if(node==null)return null;
+		}
+		return node;
+		
+	}
+	
+	private void getAllWord(Node node,List<String> words,String prefix) {
+		if (node == null) {
+	        return;
+	    }
+	    if (node.isFinal()) {
+	        words.add(prefix);
+	    }
+	    for (Node child : node.getChilds()) {
+	        getAllWord(child, words, prefix + child.getLetter());
+	    }
 	}
 
 	/**
