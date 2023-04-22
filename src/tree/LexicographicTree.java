@@ -1,9 +1,12 @@
 package tree;
 
+import java.io.BufferedReader;
 import java.io.File;
 
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringJoiner;
@@ -51,6 +54,7 @@ public class LexicographicTree {
 	 * @param word A word
 	 */
 	public void insertWord(String word) {
+		if(word.isEmpty())return;
 		if(this.containsWord(word))return;
 		this.start.addWord(word);
 		this.size++;
@@ -75,6 +79,7 @@ public class LexicographicTree {
 		List<String> words =new ArrayList<>();
 		Node node=getNodePrefix(prefix);
 		getAllWord(node, words,prefix);
+		Collections.sort(words);
 		return words;
 	}
 	
@@ -107,6 +112,9 @@ public class LexicographicTree {
 	 * @return The list of words with the given length
 	 */
 	public List<String> getWordsOfLength(int length) {
+		List<String> words =new ArrayList<>();
+		if(length<0)return words;
+		//faire comme le prefix sauf que lorsque taille du mot > length return null
 		return null;
 	}
 

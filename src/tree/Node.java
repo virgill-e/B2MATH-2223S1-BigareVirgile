@@ -71,9 +71,10 @@ public class Node implements Comparable<Node>{
 	}
 	
 	public boolean containsWord(String word) {
-	    if (word == null || word.isEmpty()) {
-	        return false;
+	    if (word == null) {
+	        return true;
 	    }
+	    if(word.isEmpty())return false;
 	    char firstChar = word.charAt(0);
 	    Node child = getChild(firstChar);
 	    if (child == null) {
