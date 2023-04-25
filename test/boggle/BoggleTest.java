@@ -20,7 +20,7 @@ public class BoggleTest {
 	private static LexicographicTree dictionary = null;
 
 	@BeforeAll
-	private static void initTestDictionary() {
+	public static void initTestDictionary() {
 		System.out.print("Loading dictionary...");
 		dictionary = new LexicographicTree("mots/dictionnaire_FR_sans_accents.txt");
 		System.out.println(" done.");
@@ -35,5 +35,6 @@ public class BoggleTest {
 		assertFalse(b.contains("sono"));
 		assertEquals(EXPECTED_WORDS, b.solve());
 	}
+	
 
 }

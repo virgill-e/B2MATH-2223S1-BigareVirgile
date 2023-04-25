@@ -13,10 +13,11 @@ import java.util.StringJoiner;
 public class Node implements Comparable<Node>{
 	private final char letter;
 	private boolean isFinal;
-	private List<Node> childs;
+	private Node[] childs;
+	
 	public Node(char letter) {
 		this.letter=letter;
-		childs=new ArrayList<>();
+		childs=new Node[0];
 		
 	}
 	
@@ -28,7 +29,7 @@ public class Node implements Comparable<Node>{
 		return this.isFinal;
 	}
 	
-	public List<Node> getChilds(){
+	public Node[] getChilds(){
 			return childs;
 	}
 	
@@ -37,22 +38,30 @@ public class Node implements Comparable<Node>{
 	}
 
 	public Node getChild(char c) {
-		if(childs.size()==0)return null;
+		if(childs.length==0)return null;
 		for(Node node:childs) {
 			if(node.getLetter()==c)return node;
 		}
 		return null;
 	}
 	
+	
 
 	public void addChild(char c) {
-		if(childs.contains(new Node(c)))return;
-		this.childs.add(new Node(c));
+		if(getChild(c)!=null)return;
+		childs=Arrays.copyOf(childs, childs.length+1);
+		childs[childs.length-1]=new Node(c);
+	}
+	public void addChild(Node n) {
+		if(getChild(n.getLetter())!=null)return;
+		childs=Arrays.copyOf(childs, childs.length+1);
+		childs[childs.length-1]=n;
 	}
 	
 	
 	
-	//ajoute un mot de maniere recurssive en appelant toujours le fils suivant
+	
+	
 	public void addWord(String word) {
 	    if (word == null || word.isEmpty()) {
 	        return;
@@ -60,14 +69,14 @@ public class Node implements Comparable<Node>{
 	    char firstChar = word.charAt(0);
 	    Node child = getChild(firstChar);
 	    if (child == null) {
-	        addChild(firstChar);
-	        child = getChild(firstChar);
+	    	child=new Node(firstChar);
+	        addChild(child);
 	    }
 	    if (word.length() == 1) {
 	        child.setFinal();
 	    } else {
 	        child.addWord(word.substring(1));
-	    } 
+	    }
 	}
 	
 	public boolean containsWord(String word) {

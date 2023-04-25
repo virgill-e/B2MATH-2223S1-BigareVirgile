@@ -1,10 +1,14 @@
 package boggle;
 
+import java.util.Random;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeSet;
 import tree.LexicographicTree;
 
 public class Boggle {
+	private char[][] grille;
+	private LexicographicTree arbre;
 	/*
 	 * CONSTRUCTORS
 	 */
@@ -15,7 +19,17 @@ public class Boggle {
 	 * @param dict A dictionary of allowed words
 	 */
 	public Boggle(int size, LexicographicTree dict) {
-		// TODO
+		if (size < 1) {
+	        throw new IllegalArgumentException("Size must be greater than 0.");
+	    }
+
+	    // Generate random letters for the grid
+	    Random rand = new Random();
+	    for (int i = 0; i < size * size; i++) {
+	    	int row = i / size;
+	        int col = i % size;
+	        grille[row][col] = (char) ('a' + rand.nextInt(26));
+	    }
 	}
 	
 	/**
@@ -25,7 +39,20 @@ public class Boggle {
 	 * @param dict A dictionary of allowed words
 	 */
 	public Boggle(int size, String letters, LexicographicTree dict) {
-		// TODO
+	    if (size < 1 || letters.length() < size * size) {
+	        throw new IllegalArgumentException("Invalid grid size or letters");
+	    }
+	    
+	    arbre=dict;
+
+	    grille = new char[size][size];
+
+	    for (int i = 0; i < size * size; i++) {
+	    	int row = i / size;
+	        int col = i % size;
+	        grille[row][col] = letters.charAt(i);
+	    }
+	    System.out.print(false);
 	}
 	
 	/*
@@ -37,7 +64,13 @@ public class Boggle {
 	 * @return a string of letters
 	 */
 	public String letters() {
-		return ""; // TODO
+		StringJoiner sj=new StringJoiner("");
+		for(char[] tab:this.grille) {
+			for(char let:tab) {
+				sj.add(String.valueOf(let));
+			}
+		}
+		return sj.toString();
 	}
 	
 	/**
@@ -64,6 +97,7 @@ public class Boggle {
 	public String toString() {
 		return ""; // TODO
 	}
+	
 
 	/*
 	 * PRIVATE METHODS

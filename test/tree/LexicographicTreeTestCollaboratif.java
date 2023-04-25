@@ -3,7 +3,11 @@ package tree;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import org.junit.jupiter.api.BeforeAll;
 
@@ -13,11 +17,13 @@ import org.junit.jupiter.api.BeforeAll;
  * Constructor
  */
 public class LexicographicTreeTestCollaboratif {
-	private static final String[] WORDS = new String[] { "aide", "as", "au", "aux", "bu", "bus", "but", "et", "ete" };
+	private static final String[] WORDS = new String[] { "a-cote", "aide", "as", "au", "aujourd'hui", "aux", "bu",
+			"bus", "but", "cote", "et", "ete" };
 	private static final LexicographicTree DICT = new LexicographicTree();
+	private static final String filename = "mots/dictionnaire_FR_sans_accents.txt";
 
 	@BeforeAll
-	static void initTestDictionary() {
+	public static void initTestDictionary() {
 		for (int i = 0; i < WORDS.length; i++) {
 			DICT.insertWord(WORDS[i]);
 		}
@@ -37,7 +43,6 @@ public class LexicographicTreeTestCollaboratif {
 			dict.insertWord(WORDS[i]);
 			assertEquals(i + 1, dict.size(), "Mot " + WORDS[i] + " non inséré");
 			dict.insertWord(WORDS[i]);
-
 			assertEquals(i + 1, dict.size(), "Mot " + WORDS[i] + " en double");
 		}
 	}
@@ -54,7 +59,6 @@ public class LexicographicTreeTestCollaboratif {
 
 	@Test
 	void getWords_General() {
-
 		assertEquals(WORDS.length, DICT.getWords("").size());
 		assertArrayEquals(WORDS, DICT.getWords("").toArray());
 
@@ -136,84 +140,118 @@ public class LexicographicTreeTestCollaboratif {
 		tree.insertWord("chien");
 		tree.insertWord("cheval");
 		tree.insertWord("oiseau");
+		tree.insertWord("chat");
+		tree.insertWord("chien");
+		tree.insertWord("cheval");
+		tree.insertWord("oiseau");
 
 		List<String> wordsOfLength = tree.getWordsOfLength(4);
 		assertEquals(1, wordsOfLength.size());
 		assertTrue(wordsOfLength.contains("chat"));
 	}
-	 @Test
-	    void testInsertEmptyWord() {
-		 LexicographicTree tree = new LexicographicTree();
-	        tree.insertWord("");
-	        assertEquals(0, tree.size());
-	    }
 
-	    @Test
-	    void testContainsEmptyWord() {
-	    	LexicographicTree tree = new LexicographicTree();
-	        assertFalse(tree.containsWord(""));
-	    }
+	@Test
+	void testGetWordsWithEmptyPrefix() {
+		LexicographicTree tree = new LexicographicTree();
+		tree.insertWord("chat");
+		tree.insertWord("chien");
+		tree.insertWord("cheval");
+		tree.insertWord("oiseau");
 
-	    @Test
-	    void testGetWordsWithNonExistentPrefix() {
-	    	LexicographicTree tree = new LexicographicTree();
-	        tree.insertWord("chat");
-	        tree.insertWord("chien");
-	        tree.insertWord("cheval");
-	        tree.insertWord("oiseau");
+		List<String> wordsWithEmptyPrefix = tree.getWords("");
+		assertEquals(4, wordsWithEmptyPrefix.size());
+		assertTrue(wordsWithEmptyPrefix.containsAll(Arrays.asList("chat", "cheval", "chien", "oiseau")));
+	}
 
-	        List<String> wordsWithNonExistentPrefix = tree.getWords("xyz");
-	        assertEquals(0, wordsWithNonExistentPrefix.size());
-	    }
+	@Test
+	void testGetWordsWithNonExistentPrefix() {
+		LexicographicTree tree = new LexicographicTree();
+		tree.insertWord("chat");
+		tree.insertWord("chien");
+		tree.insertWord("cheval");
+		tree.insertWord("oiseau");
 
-	    @Test
-	    void testGetWordsWithPrefixLongerThanWord() {
-	    	LexicographicTree tree = new LexicographicTree();
-	        tree.insertWord("chat");
-	        tree.insertWord("chien");
-	        tree.insertWord("cheval");
-	        tree.insertWord("oiseau");
+		List<String> wordsWithPrefix = tree.getWords("xyz");
+		assertEquals(0, wordsWithPrefix.size());
+	}
 
-	        List<String> wordsWithLongPrefix = tree.getWords("chienoiseau");
-	        assertEquals(0, wordsWithLongPrefix.size());
-	    }
-	    
-	    @Test
-	    void testInsertWordsFromFile() {
-	        LexicographicTree treeFromFile = new LexicographicTree("mots/dictionnaire_FR_test_1.txt");
-	        assertTrue(treeFromFile.containsWord("zythums"));
-	        assertTrue(treeFromFile.containsWord("zythum"));
-	        assertTrue(treeFromFile.containsWord("zythons"));
-	        assertTrue(treeFromFile.containsWord("zython"));
-	        assertEquals(4, treeFromFile.size());
-	    }
+	@Test
+	void testInsertWordWithSpecialCharacters() {
+		LexicographicTree tree = new LexicographicTree();
+		tree.insertWord("chat@123~");
+		tree.insertWord("chien$%^");
+		tree.insertWord("cheval*&(");
+		tree.insertWord("oiseau)_+");
 
-	    @Test
-	    void testEmptyPrefix() {
-	    	LexicographicTree tree = new LexicographicTree();
-	        tree.insertWord("chat");
-	        tree.insertWord("chien");
-	        tree.insertWord("cheval");
-	        tree.insertWord("oiseau");
+		assertTrue(tree.containsWord("chat@123~"));
+		assertTrue(tree.containsWord("chien$%^"));
+		assertTrue(tree.containsWord("cheval*&("));
+		assertTrue(tree.containsWord("oiseau)_+"));
+	}
 
-	        List<String> allWords = tree.getWords("");
-	        assertEquals(4, allWords.size());
-	        assertTrue(allWords.contains("chat"));
-	        assertTrue(allWords.contains("chien"));
-	        assertTrue(allWords.contains("cheval"));
-	        assertTrue(allWords.contains("oiseau"));
-	    }
+	@Test
+	void testInsertDictionnary() {
+		LexicographicTree tree = new LexicographicTree(filename);
+		List<String> dict = tree.getWords("");
+		assertEquals(327956, dict.size());
+	}
 
-	    @Test
-	    void testGetWordsOfInvalidLength() {
-	    	LexicographicTree tree = new LexicographicTree();
-	        tree.insertWord("chat");
-	        tree.insertWord("chien");
-	        tree.insertWord("cheval");
-	        tree.insertWord("oiseau");
+	@Test
+	void testSearchingForWordsOfIncreasingLength() {
+		LexicographicTree dico = new LexicographicTree(filename);
+		for (int i = 0; i < 4; i++) {
+			int total = 0;
+			for (int n = 0; n <= 28; n++) {
+				int count = dico.getWordsOfLength(n).size();
+				total += count;
+			}
+			assertEquals(dico.size(), total);
+		}
+	}
 
-	        List<String> wordsOfInvalidLength = tree.getWordsOfLength(-1);
-	        assertEquals(0, wordsOfInvalidLength.size());
-	    }
+	@Test
+	void testSearchingNonExistingWordsInDictionary() {
+		int repeatCount = 20;
+		File file = new File(filename);
+		LexicographicTree dico = new LexicographicTree(filename);
+		for (int i = 0; i < repeatCount; i++) {
+			Scanner input;
+			try {
+				input = new Scanner(file);
+				while (input.hasNextLine()) {
+					String word = input.nextLine() + "xx";
+					boolean found = dico.containsWord(word);
+					if (found) {
+						assertTrue(false, word + " / " + word.length() + " -> " + found);
+					}
+				}
+				input.close();
+			} catch (FileNotFoundException e) {
+				assertTrue(false, "File not found: " + filename);
+			}
+		}
+	}
 
+	@Test
+	void testSearchingExistingWordsInDictionary() {
+		int repeatCount = 20;
+		File file = new File(filename);
+		LexicographicTree dico = new LexicographicTree(filename);
+		for (int i = 0; i < repeatCount; i++) {
+			Scanner input;
+			try {
+				input = new Scanner(file);
+				while (input.hasNextLine()) {
+					String word = input.nextLine();
+					boolean found = dico.containsWord(word);
+					if (!found) {
+						assertTrue(false, word + " / " + word.length() + " -> " + found);
+					}
+				}
+				input.close();
+			} catch (FileNotFoundException e) {
+				assertTrue(false, "File not found: " + filename);
+			}
+		}
+	}
 }
