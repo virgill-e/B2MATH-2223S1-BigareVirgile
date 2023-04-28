@@ -4,10 +4,17 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeSet;
+
 import tree.LexicographicTree;
 
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.generate.GridGraphGenerator;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
+
 public class Boggle {
-	private char[][] grille;
+	private Graph<Character, DefaultEdge> graph;
 	private LexicographicTree arbre;
 	/*
 	 * CONSTRUCTORS
@@ -22,8 +29,9 @@ public class Boggle {
 		if (size < 1) {
 	        throw new IllegalArgumentException("Size must be greater than 0.");
 	    }
+		Character[][] grille=new Character[size][size];
 
-	    // Generate random letters for the grid
+		
 	    Random rand = new Random();
 	    for (int i = 0; i < size * size; i++) {
 	    	int row = i / size;
@@ -45,14 +53,14 @@ public class Boggle {
 	    
 	    arbre=dict;
 
-	    grille = new char[size][size];
+	    Character[][] grille = new Character[size][size];
 
 	    for (int i = 0; i < size * size; i++) {
 	    	int row = i / size;
 	        int col = i % size;
 	        grille[row][col] = letters.charAt(i);
 	    }
-	    System.out.print(false);
+	    
 	}
 	
 	/*
@@ -64,13 +72,8 @@ public class Boggle {
 	 * @return a string of letters
 	 */
 	public String letters() {
-		StringJoiner sj=new StringJoiner("");
-		for(char[] tab:this.grille) {
-			for(char let:tab) {
-				sj.add(String.valueOf(let));
-			}
-		}
-		return sj.toString();
+		//TODO:
+		return null;
 	}
 	
 	/**
@@ -102,6 +105,23 @@ public class Boggle {
 	/*
 	 * PRIVATE METHODS
 	 */
+	
+	private void setVertexGraph(Character[][] lettersTab) {
+		for(Character[] tab:lettersTab) {
+			for(Character lett:tab) {
+				graph.addVertex(lett);
+			}
+		}
+	}
+	
+	private void setEdgeGraph(Character[][] lettersTab) {
+		for(int i=0;i<lettersTab.length;i++) {
+			for(int j=0;j<lettersTab[i].length;j++) {
+				//TODO: faire les lien avec les 8 voisins si il existe ()
+			}
+		}
+	}
+	
 
 	// TODO
 	

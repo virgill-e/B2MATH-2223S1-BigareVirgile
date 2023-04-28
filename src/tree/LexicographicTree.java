@@ -97,28 +97,7 @@ public class LexicographicTree {
 		return words;
 	}
 
-	private Node getNodePrefix(String prefix) {
-		Node node = this.start;
-		for (int i = 0; i < prefix.length(); i++) {
-			node = node.getChild(prefix.charAt(i));
-			if (node == null)
-				return null;
-		}
-		return node;
 
-	}
-
-	private void getAllWord(Node node, List<String> words, String prefix) {
-		if (node == null) {
-			return;
-		}
-		if (node.isFinal()) {
-			words.add(prefix);
-		}
-		for (Node child : node.getChilds()) {
-			getAllWord(child, words, prefix + child.getLetter());
-		}
-	}
 
 	/**
 	 * Returns an alphabetic list of all words of a given length. If 'length' is
@@ -137,6 +116,12 @@ public class LexicographicTree {
 		return words;
 	}
 
+	
+
+	/*
+	 * PRIVATE METHODS
+	 */
+	
 	private void getAllWordsOfLength(Node node, List<String> words, int length, String currentWord) {
 		if (currentWord.length() == length) {
 			if (node.isFinal()) {
@@ -148,12 +133,29 @@ public class LexicographicTree {
 			getAllWordsOfLength(child, words, length, currentWord + child.getLetter());
 		}
 	}
+	
+	private void getAllWord(Node node, List<String> words, String prefix) {
+		if (node == null) {
+			return;
+		}
+		if (node.isFinal()) {
+			words.add(prefix);
+		}
+		for (Node child : node.getChilds()) {
+			getAllWord(child, words, prefix + child.getLetter());
+		}
+	}
+	
+	private Node getNodePrefix(String prefix) {
+		Node node = this.start;
+		for (int i = 0; i < prefix.length(); i++) {
+			node = node.getChild(prefix.charAt(i));
+			if (node == null)
+				return null;
+		}
+		return node;
 
-	/*
-	 * PRIVATE METHODS
-	 */
-
-	// TODO
+	}
 
 	/*
 	 * TEST FUNCTIONS
