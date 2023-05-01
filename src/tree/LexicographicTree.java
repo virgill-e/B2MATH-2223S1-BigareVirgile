@@ -96,6 +96,10 @@ public class LexicographicTree {
 		Collections.sort(words);
 		return words;
 	}
+	
+	public Node getStart() {
+		return this.start;
+	}
 
 
 
