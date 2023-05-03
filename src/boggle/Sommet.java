@@ -1,5 +1,9 @@
 package boggle;
 
+import java.util.Objects;
+
+import org.hamcrest.core.IsInstanceOf;
+
 public class Sommet {
 	private final char letter;
 	private boolean isVisited;
@@ -20,5 +24,7 @@ public class Sommet {
 	public boolean isVisited() {
 		return this.isVisited;
 	}
+	
+	
 
 }

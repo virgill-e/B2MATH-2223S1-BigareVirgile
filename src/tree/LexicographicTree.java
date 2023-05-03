@@ -96,12 +96,29 @@ public class LexicographicTree {
 		Collections.sort(words);
 		return words;
 	}
-	
+
+	/**
+	 * renvoie -1 si aucun mot derive du prefix, 0 si des mots derive du prefix, et
+	 * 1 si un/des mots derivent du prefix et la derniere lettre est final
+	 * 
+	 * @param prefix
+	 * @return
+	 */
+	public int checkIfGetWordAndFinal(String prefix) {
+		int rep=-1;
+		List<String> words = new ArrayList<>();
+		Node node = getNodePrefix(prefix);
+		getAllWord(node, words, prefix);
+		Collections.sort(words);
+		if(!words.isEmpty())rep++;
+		if(node!=null&&node.isFinal())rep++;
+		
+		return rep;
+	}
+
 	public Node getStart() {
 		return this.start;
 	}
-
-
 
 	/**
 	 * Returns an alphabetic list of all words of a given length. If 'length' is
@@ -120,12 +137,10 @@ public class LexicographicTree {
 		return words;
 	}
 
-	
-
 	/*
 	 * PRIVATE METHODS
 	 */
-	
+
 	private void getAllWordsOfLength(Node node, List<String> words, int length, String currentWord) {
 		if (currentWord.length() == length) {
 			if (node.isFinal()) {
@@ -137,7 +152,7 @@ public class LexicographicTree {
 			getAllWordsOfLength(child, words, length, currentWord + child.getLetter());
 		}
 	}
-	
+
 	private void getAllWord(Node node, List<String> words, String prefix) {
 		if (node == null) {
 			return;
@@ -149,7 +164,7 @@ public class LexicographicTree {
 			getAllWord(child, words, prefix + child.getLetter());
 		}
 	}
-	
+
 	private Node getNodePrefix(String prefix) {
 		Node node = this.start;
 		for (int i = 0; i < prefix.length(); i++) {
@@ -159,6 +174,13 @@ public class LexicographicTree {
 		}
 		return node;
 
+	}
+	
+	public boolean isPrefix(String prefix) {
+		if(prefix==null)return false;
+		Node node=getNodePrefix(prefix);
+		if(node==null)return false;
+		return node.getChilds().length>0?true:false;
 	}
 
 	/*
@@ -277,6 +299,8 @@ public class LexicographicTree {
 		testDictionaryPerformance("mots/dictionnaire_FR_sans_accents.txt");
 
 		// CST : test de taille maximale si VM -Xms2048m -Xmx2048m
-		testDictionarySize();
+		//testDictionarySize();
 	}
+
+	
 }
