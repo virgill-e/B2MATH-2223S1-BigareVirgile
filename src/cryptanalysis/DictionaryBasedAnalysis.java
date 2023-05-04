@@ -7,12 +7,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import tree.LexicographicTree;
 
@@ -26,15 +29,19 @@ public class DictionaryBasedAnalysis {
 	private static final Pattern PATTERN_ALL_WORD = Pattern.compile("(\\w+)");
 	private static final Comparator<String> COMP_STRING_BY_LENGTH = (word1, word2) -> word2.length() - word1.length();
 
-	private List<String> words;
+	private List<String> encodedWords;
 	private final LexicographicTree dict;
+	private String alphabet;
+	private Map<Integer, List<String>> wordsByLength;
 
 	/*
 	 * CONSTRUCTOR
 	 */
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
+		this.wordsByLength=new HashMap<>();
 		this.dict = dict;
-		words = new ArrayList<String>(Arrays.asList(cryptogram.split(" "))).stream()
+		this.alphabet=generateRandomAlphabet();
+		this.encodedWords = new ArrayList<String>(Arrays.asList(cryptogram.split(" "))).stream()
 				.filter(word -> PATTERN_ALL_WORD.matcher(word).matches() && word.length() >= 3)
 				.map(String::trim)
 				.distinct()
@@ -54,7 +61,62 @@ public class DictionaryBasedAnalysis {
 	 * @return The decoding alphabet at the end of the analysis process
 	 */
 	public String guessApproximatedAlphabet(String alphabet) {
-		return ""; // TODO
+		int score=this.alphabetScore(this.alphabet);
+		int actualScore;
+		String actualAlphabet;
+		int boucleI=0;
+		for(String encodedWord :encodedWords) {
+			boucleI++;
+			System.out.println(boucleI+"/"+encodedWords.size());
+			//si la K longuer du mot n'est pas dans la liste l'ajouter
+			List<String> actualCompatibleWords=this.wordsByLength.get(encodedWord.length());
+			if(actualCompatibleWords==null) {
+				actualCompatibleWords=getCompatibleWords(encodedWord);
+				wordsByLength.put(encodedWord.length(), actualCompatibleWords);
+			}
+			
+			
+			for(String word:actualCompatibleWords) {
+				actualAlphabet=generateAlphabet(encodedWord,word.toUpperCase());
+				actualScore=this.alphabetScore(actualAlphabet);//tres lent
+				
+				if(actualScore>score) {
+					System.out.println(this.alphabet);
+					System.out.println(actualScore);
+					score=actualScore;
+					this.alphabet=actualAlphabet;
+				}
+				if(dict.containsWord(applySubstitution(encodedWord, this.alphabet))) {
+					break;
+				}
+			}
+			
+		}
+		
+		return this.alphabet;// TODO
+	}
+
+	private String generateAlphabet(String encoded, String word) {
+		char[] inverseAlphabet = new char[26];
+	    for(int i=0;i<this.alphabet.length();i++) {
+	    	inverseAlphabet[i]=this.alphabet.charAt(i);
+	    }
+
+	    for (int i = 0; i < encoded.length(); i++) {
+	        char encodedChar = encoded.charAt(i);
+	        char wordChar = word.charAt(i);
+	        if(LETTERS.indexOf(encodedChar+"")==-1)continue;
+	        int encodedIndex = encodedChar - 'A';
+
+	        inverseAlphabet[encodedIndex] = wordChar;
+	    }
+
+	    return new String(inverseAlphabet);
+	}
+
+	private List<String> getCompatibleWords(String word) {
+		List<String> actualWord=dict.getWordsOfLength(word.length());
+		return actualWord;
 	}
 
 	/**
@@ -114,6 +176,31 @@ public class DictionaryBasedAnalysis {
 			e.printStackTrace();
 		}
 		return data;
+	}
+	
+	private String generateRandomAlphabet() {
+        List<Character> shuffledAlphabet = new ArrayList<>();
+        for (int i=0 ;i<LETTERS.length();i++) {
+        	shuffledAlphabet.add(LETTERS.charAt(i));
+        }
+        Collections.shuffle(shuffledAlphabet);
+
+        StringBuilder sb = new StringBuilder();
+        for (char c : shuffledAlphabet) {
+            sb.append(c);
+        }
+        return sb.toString();
+	}
+	
+	private int alphabetScore(String alphabet) {
+		if(alphabet.length()!=26)return 0;
+		int score=0;
+		for(String word:this.encodedWords) {
+			if(dict.containsWord(applySubstitution(word, alphabet).toLowerCase())) {
+				score+=word.length();
+			}
+		}
+		return score;
 	}
 
 	/*

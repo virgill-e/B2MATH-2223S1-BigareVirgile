@@ -1,14 +1,6 @@
 package tree;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringJoiner;
 
 public class Node implements Comparable<Node>{
 	private final char letter;
@@ -18,7 +10,6 @@ public class Node implements Comparable<Node>{
 	public Node(char letter) {
 		this.letter=letter;
 		childs=new Node[0];
-		
 	}
 	
 	public char getLetter() {
