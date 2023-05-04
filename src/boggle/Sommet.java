@@ -1,8 +1,6 @@
 package boggle;
 
-import java.util.Objects;
 
-import org.hamcrest.core.IsInstanceOf;
 
 public class Sommet {
 	private final char letter;

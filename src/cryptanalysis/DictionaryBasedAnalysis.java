@@ -35,8 +35,11 @@ public class DictionaryBasedAnalysis {
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
 		this.dict = dict;
 		words = new ArrayList<String>(Arrays.asList(cryptogram.split(" "))).stream()
-				.filter(word -> PATTERN_ALL_WORD.matcher(word).matches() && word.length() >= 3).map(String::trim)
-				.distinct().sorted(COMP_STRING_BY_LENGTH).collect(Collectors.toList());
+				.filter(word -> PATTERN_ALL_WORD.matcher(word).matches() && word.length() >= 3)
+				.map(String::trim)
+				.distinct()
+				.sorted(COMP_STRING_BY_LENGTH)
+				.collect(Collectors.toList());
 	}
 
 	/*
