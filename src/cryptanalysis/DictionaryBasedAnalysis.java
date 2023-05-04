@@ -225,7 +225,11 @@ public class DictionaryBasedAnalysis {
 	}
 
 	private String getCompatibleWord(String encodedWord) {
-		List<String> words = dict.getWordsOfLength(encodedWord.length());
+		List<String> words=this.wordsByLength.get(encodedWord.length());
+		if(words==null) {
+			words=dict.getWordsOfLength(encodedWord.length());
+			this.wordsByLength.put(encodedWord.length(), words);
+		}
 		for (String word : words) {
 			if (isCompatible(word, encodedWord)) {
 				return word;
