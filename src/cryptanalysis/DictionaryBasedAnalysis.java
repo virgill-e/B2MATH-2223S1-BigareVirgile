@@ -66,15 +66,15 @@ public class DictionaryBasedAnalysis {
 		int boucleI = 0;
 		for (String encodedWord : encodedWords) {
 			boucleI++;
-			System.out.println(boucleI + "/" + encodedWords.size());
+			//System.out.println(boucleI + "/" + encodedWords.size());
 			String word = getCompatibleWord(encodedWord);
 			if(word==null)continue;
 			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase());
 			actualScore = this.alphabetScore(actualAlphabet);
 			
 			if (actualScore > score) {
-				//System.out.println(this.alphabet);
-				//System.out.println(actualScore);
+				System.out.println(this.alphabet);
+				System.out.println(actualScore);
 				score = actualScore;
 				this.alphabet = actualAlphabet;
 			}
@@ -101,11 +101,6 @@ public class DictionaryBasedAnalysis {
 		}
 
 		return new String(inverseAlphabet);
-	}
-
-	private List<String> getCompatibleWords(String word) {
-		List<String> actualWord = dict.getWordsOfLength(word.length());
-		return actualWord;
 	}
 
 	/**
@@ -189,7 +184,7 @@ public class DictionaryBasedAnalysis {
 			if(this.findWords.contains(word))continue;
 			if (dict.containsWord(applySubstitution(word, alphabet).toLowerCase())) {
 				this.findWords.add(word);
-				score += word.length();
+				score += 1;
 			}
 		}
 		return score;
@@ -274,7 +269,7 @@ public class DictionaryBasedAnalysis {
 		System.out.println();
 
 		// Display decoded text
-		System.out.println("*** DECODED TEXT ***\n" + applySubstitution(cryptogram, finalAlphabet).substring(0, 200));
-		System.out.println();
+		//System.out.println("*** DECODED TEXT ***\n" + applySubstitution(cryptogram, finalAlphabet).substring(0, 200));
+		//System.out.println();
 	}
 }
