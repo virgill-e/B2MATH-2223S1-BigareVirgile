@@ -33,20 +33,19 @@ public class DictionaryBasedAnalysis {
 	private final LexicographicTree dict;
 	private String alphabet;
 	private Map<Integer, List<String>> wordsByLength;
+	private Set<String> findWords;
 
 	/*
 	 * CONSTRUCTOR
 	 */
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
-		this.wordsByLength=new HashMap<>();
+		this.findWords=new HashSet<>();
+		this.wordsByLength = new HashMap<>();
 		this.dict = dict;
-		this.alphabet=generateRandomAlphabet();
+		this.alphabet = generateRandomAlphabet();
 		this.encodedWords = new ArrayList<String>(Arrays.asList(cryptogram.split(" "))).stream()
-				.filter(word -> PATTERN_ALL_WORD.matcher(word).matches() && word.length() >= 3)
-				.map(String::trim)
-				.distinct()
-				.sorted(COMP_STRING_BY_LENGTH)
-				.collect(Collectors.toList());
+				.filter(word -> PATTERN_ALL_WORD.matcher(word).matches() && word.length() >= 3).map(String::trim)
+				.distinct().sorted(COMP_STRING_BY_LENGTH).collect(Collectors.toList());
 	}
 
 	/*
@@ -61,61 +60,51 @@ public class DictionaryBasedAnalysis {
 	 * @return The decoding alphabet at the end of the analysis process
 	 */
 	public String guessApproximatedAlphabet(String alphabet) {
-		int score=this.alphabetScore(this.alphabet);
+		int score = this.alphabetScore(this.alphabet);
 		int actualScore;
 		String actualAlphabet;
-		int boucleI=0;
-		for(String encodedWord :encodedWords) {
+		int boucleI = 0;
+		for (String encodedWord : encodedWords) {
 			boucleI++;
-			System.out.println(boucleI+"/"+encodedWords.size());
-			//si la K longuer du mot n'est pas dans la liste l'ajouter
-			List<String> actualCompatibleWords=this.wordsByLength.get(encodedWord.length());
-			if(actualCompatibleWords==null) {
-				actualCompatibleWords=getCompatibleWords(encodedWord);
-				wordsByLength.put(encodedWord.length(), actualCompatibleWords);
+			System.out.println(boucleI + "/" + encodedWords.size());
+			String word = getCompatibleWord(encodedWord);
+			if(word==null)continue;
+			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase());
+			actualScore = this.alphabetScore(actualAlphabet);
+			
+			if (actualScore > score) {
+				//System.out.println(this.alphabet);
+				//System.out.println(actualScore);
+				score = actualScore;
+				this.alphabet = actualAlphabet;
 			}
-			
-			
-			for(String word:actualCompatibleWords) {
-				actualAlphabet=generateAlphabet(encodedWord,word.toUpperCase());
-				actualScore=this.alphabetScore(actualAlphabet);//tres lent
-				
-				if(actualScore>score) {
-					System.out.println(this.alphabet);
-					System.out.println(actualScore);
-					score=actualScore;
-					this.alphabet=actualAlphabet;
-				}
-				if(dict.containsWord(applySubstitution(encodedWord, this.alphabet))) {
-					break;
-				}
-			}
-			
+
 		}
-		
+
 		return this.alphabet;// TODO
 	}
 
 	private String generateAlphabet(String encoded, String word) {
 		char[] inverseAlphabet = new char[26];
-	    for(int i=0;i<this.alphabet.length();i++) {
-	    	inverseAlphabet[i]=this.alphabet.charAt(i);
-	    }
+		for (int i = 0; i < this.alphabet.length(); i++) {
+			inverseAlphabet[i] = this.alphabet.charAt(i);
+		}
 
-	    for (int i = 0; i < encoded.length(); i++) {
-	        char encodedChar = encoded.charAt(i);
-	        char wordChar = word.charAt(i);
-	        if(LETTERS.indexOf(encodedChar+"")==-1)continue;
-	        int encodedIndex = encodedChar - 'A';
+		for (int i = 0; i < encoded.length(); i++) {
+			char encodedChar = encoded.charAt(i);
+			char wordChar = word.charAt(i);
+			if (LETTERS.indexOf(encodedChar + "") == -1)
+				continue;
+			int encodedIndex = encodedChar - 'A';
 
-	        inverseAlphabet[encodedIndex] = wordChar;
-	    }
+			inverseAlphabet[encodedIndex] = wordChar;
+		}
 
-	    return new String(inverseAlphabet);
+		return new String(inverseAlphabet);
 	}
 
 	private List<String> getCompatibleWords(String word) {
-		List<String> actualWord=dict.getWordsOfLength(word.length());
+		List<String> actualWord = dict.getWordsOfLength(word.length());
 		return actualWord;
 	}
 
@@ -177,30 +166,72 @@ public class DictionaryBasedAnalysis {
 		}
 		return data;
 	}
-	
-	private String generateRandomAlphabet() {
-        List<Character> shuffledAlphabet = new ArrayList<>();
-        for (int i=0 ;i<LETTERS.length();i++) {
-        	shuffledAlphabet.add(LETTERS.charAt(i));
-        }
-        Collections.shuffle(shuffledAlphabet);
 
-        StringBuilder sb = new StringBuilder();
-        for (char c : shuffledAlphabet) {
-            sb.append(c);
-        }
-        return sb.toString();
+	private String generateRandomAlphabet() {
+		List<Character> shuffledAlphabet = new ArrayList<>();
+		for (int i = 0; i < LETTERS.length(); i++) {
+			shuffledAlphabet.add(LETTERS.charAt(i));
+		}
+		Collections.shuffle(shuffledAlphabet);
+
+		StringBuilder sb = new StringBuilder();
+		for (char c : shuffledAlphabet) {
+			sb.append(c);
+		}
+		return sb.toString();
 	}
-	
+
 	private int alphabetScore(String alphabet) {
-		if(alphabet.length()!=26)return 0;
-		int score=0;
-		for(String word:this.encodedWords) {
-			if(dict.containsWord(applySubstitution(word, alphabet).toLowerCase())) {
-				score+=word.length();
+		if (alphabet.length() != 26)
+			return 0;
+		int score = 0;
+		for (String word : this.encodedWords) {
+			if(this.findWords.contains(word))continue;
+			if (dict.containsWord(applySubstitution(word, alphabet).toLowerCase())) {
+				this.findWords.add(word);
+				score += word.length();
 			}
 		}
 		return score;
+	}
+
+	public boolean isCompatible(String word, String encodedWord) {
+		if (encodedWord.length() != word.length()) {
+			// Si la longueur du mot chiffré et du mot proposé ne correspondent pas, ils ne
+			// sont pas compatibles
+			return false;
+		}
+		int[] encodingMap = new int[26];
+		for (int i = 0; i < encodedWord.length(); i++) {
+			char encodedChar = encodedWord.charAt(i);
+			char charToDecode = word.charAt(i);
+			int encodedCharIndex = encodedChar - 'A';
+			int charToDecodeIndex = charToDecode - 'A';
+			if (encodedCharIndex < 0 || charToDecodeIndex < 0)
+				return false;
+			if (encodingMap[encodedCharIndex] == 0) {
+				// Si l'on n'a pas encore trouvé la correspondance pour la lettre chiffrée, on
+				// l'ajoute
+				encodingMap[encodedCharIndex] = charToDecodeIndex + 1;
+			} else if (encodingMap[encodedCharIndex] != charToDecodeIndex + 1) {
+				// Si on a déjà trouvé une correspondance différente pour la lettre chiffrée,
+				// les mots ne sont pas compatibles
+				return false;
+			}
+		}
+		// Si toutes les lettres du mot chiffré ont été décodées avec succès, le mot
+		// proposé est compatible
+		return true;
+	}
+
+	private String getCompatibleWord(String encodedWord) {
+		List<String> words = dict.getWordsOfLength(encodedWord.length());
+		for (String word : words) {
+			if (isCompatible(word, encodedWord)) {
+				return word;
+			}
+		}
+		return null;
 	}
 
 	/*
