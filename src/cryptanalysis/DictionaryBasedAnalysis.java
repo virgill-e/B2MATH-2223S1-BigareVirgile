@@ -66,15 +66,13 @@ public class DictionaryBasedAnalysis {
 		int boucleI = 0;
 		for (String encodedWord : encodedWords) {
 			boucleI++;
-			//System.out.println(boucleI + "/" + encodedWords.size());
+			System.out.println(boucleI + "/" + encodedWords.size());
 			String word = getCompatibleWord(encodedWord);
 			if(word==null)continue;
 			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase());
 			actualScore = this.alphabetScore(actualAlphabet);
 			
 			if (actualScore > score) {
-				System.out.println(this.alphabet);
-				System.out.println(actualScore);
 				score = actualScore;
 				this.alphabet = actualAlphabet;
 			}
