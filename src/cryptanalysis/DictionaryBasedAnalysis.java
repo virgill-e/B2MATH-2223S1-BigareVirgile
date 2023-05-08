@@ -265,7 +265,7 @@ public class DictionaryBasedAnalysis {
 		System.out.println();
 
 		// Display decoded text
-		//System.out.println("*** DECODED TEXT ***\n" + applySubstitution(cryptogram, finalAlphabet).substring(0, 200));
-		//System.out.println();
+		System.out.println("*** DECODED TEXT ***\n" + applySubstitution(cryptogram, finalAlphabet).substring(0, 200));
+		System.out.println();
 	}
 }
