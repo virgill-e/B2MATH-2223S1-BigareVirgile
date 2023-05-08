@@ -33,13 +33,13 @@ public class DictionaryBasedAnalysis {
 	private final LexicographicTree dict;
 	private String alphabet;
 	private Map<Integer, List<String>> wordsByLength;
-	private Set<String> solvedWords;
+	private Map<String,String> solvedWords;
 
 	/*
 	 * CONSTRUCTOR
 	 */
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
-		this.solvedWords=new HashSet<>();
+		this.solvedWords=new HashMap<>();
 		this.wordsByLength = new HashMap<>();
 		this.dict = dict;
 		this.alphabet = generateRandomAlphabet();
@@ -65,6 +65,7 @@ public class DictionaryBasedAnalysis {
 		String actualAlphabet;
 		int boucleI = 0;
 		for (String encodedWord : encodedWords) {
+			if(solvedWords.containsKey(encodedWord))continue;
 			boucleI++;
 			System.out.println(boucleI + "/" + encodedWords.size());
 			String word = getCompatibleWord(encodedWord);
@@ -180,10 +181,15 @@ public class DictionaryBasedAnalysis {
 		if (alphabet.length() != 26)
 			return 0;
 		int score = 0;
-		for (String word : this.encodedWords) {
-			if(this.solvedWords.contains(word))continue;
-			if (dict.containsWord(applySubstitution(word, alphabet).toLowerCase())) {
-				this.solvedWords.add(word);
+		for (String encodedword : this.encodedWords) {
+			String word=applySubstitution(encodedword, alphabet).toLowerCase();
+
+			if(this.solvedWords.get(encodedword)==word) {
+				score++;
+				continue;
+			}
+			if (dict.containsWord(word)) {
+				this.solvedWords.put(encodedword,word);
 				score += 1;
 			}
 		}
