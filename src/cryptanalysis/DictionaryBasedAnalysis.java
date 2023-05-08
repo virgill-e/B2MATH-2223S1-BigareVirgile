@@ -84,24 +84,7 @@ public class DictionaryBasedAnalysis {
 		return this.alphabet;// TODO
 	}
 
-	private String generateAlphabet(String encoded, String word) {
-		char[] inverseAlphabet = new char[26];
-		for (int i = 0; i < this.alphabet.length(); i++) {
-			inverseAlphabet[i] = this.alphabet.charAt(i);
-		}
-
-		for (int i = 0; i < encoded.length(); i++) {
-			char encodedChar = encoded.charAt(i);
-			char wordChar = word.charAt(i);
-			if (LETTERS.indexOf(encodedChar + "") == -1)
-				continue;
-			int encodedIndex = encodedChar - 'A';
-
-			inverseAlphabet[encodedIndex] = wordChar;
-		}
-
-		return new String(inverseAlphabet);
-	}
+	
 
 	/**
 	 * Applies an alphabet-specified substitution to a text.
@@ -142,6 +125,25 @@ public class DictionaryBasedAnalysis {
 			result += (a.charAt(i) == b.charAt(i)) ? " " : "x";
 		}
 		return result;
+	}
+	
+	private String generateAlphabet(String encoded, String word) {
+		char[] inverseAlphabet = new char[26];
+		for (int i = 0; i < this.alphabet.length(); i++) {
+			inverseAlphabet[i] = this.alphabet.charAt(i);
+		}
+
+		for (int i = 0; i < encoded.length(); i++) {
+			char encodedChar = encoded.charAt(i);
+			char wordChar = word.charAt(i);
+			if (LETTERS.indexOf(encodedChar + "") == -1)
+				continue;
+			int encodedIndex = encodedChar - 'A';
+
+			inverseAlphabet[encodedIndex] = wordChar;
+		}
+
+		return new String(inverseAlphabet);
 	}
 
 	/**
