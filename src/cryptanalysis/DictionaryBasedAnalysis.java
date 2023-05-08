@@ -33,13 +33,13 @@ public class DictionaryBasedAnalysis {
 	private final LexicographicTree dict;
 	private String alphabet;
 	private Map<Integer, List<String>> wordsByLength;
-	private Set<String> findWords;
+	private Set<String> solvedWords;
 
 	/*
 	 * CONSTRUCTOR
 	 */
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
-		this.findWords=new HashSet<>();
+		this.solvedWords=new HashSet<>();
 		this.wordsByLength = new HashMap<>();
 		this.dict = dict;
 		this.alphabet = generateRandomAlphabet();
@@ -183,41 +183,31 @@ public class DictionaryBasedAnalysis {
 			return 0;
 		int score = 0;
 		for (String word : this.encodedWords) {
-			if(this.findWords.contains(word))continue;
+			if(this.solvedWords.contains(word))continue;
 			if (dict.containsWord(applySubstitution(word, alphabet).toLowerCase())) {
-				this.findWords.add(word);
+				this.solvedWords.add(word);
 				score += 1;
 			}
 		}
 		return score;
 	}
 
-	public boolean isCompatible(String word, String encodedWord) {
+	private boolean isCompatible(String word, String encodedWord) {
+		Map<Character, Character> correspondance=new HashMap<>();
+		word=word.toUpperCase();
 		if (encodedWord.length() != word.length()) {
-			// Si la longueur du mot chiffré et du mot proposé ne correspondent pas, ils ne
-			// sont pas compatibles
 			return false;
 		}
-		int[] encodingMap = new int[26];
-		for (int i = 0; i < encodedWord.length(); i++) {
-			char encodedChar = encodedWord.charAt(i);
-			char charToDecode = word.charAt(i);
-			int encodedCharIndex = encodedChar - 'A';
-			int charToDecodeIndex = charToDecode - 'A';
-			if (encodedCharIndex < 0 || charToDecodeIndex < 0)
-				return false;
-			if (encodingMap[encodedCharIndex] == 0) {
-				// Si l'on n'a pas encore trouvé la correspondance pour la lettre chiffrée, on
-				// l'ajoute
-				encodingMap[encodedCharIndex] = charToDecodeIndex + 1;
-			} else if (encodingMap[encodedCharIndex] != charToDecodeIndex + 1) {
-				// Si on a déjà trouvé une correspondance différente pour la lettre chiffrée,
-				// les mots ne sont pas compatibles
+		
+		for(int i=0;i<word.length();i++) {
+			Character wordCharacter = Character.valueOf(word.charAt(i));
+			Character encodedCharacter = Character.valueOf(encodedWord.charAt(i));
+			if(correspondance.get(wordCharacter)!=null&&correspondance.get(wordCharacter)!=encodedCharacter) {
 				return false;
 			}
+			correspondance.put(wordCharacter, encodedCharacter);
 		}
-		// Si toutes les lettres du mot chiffré ont été décodées avec succès, le mot
-		// proposé est compatible
+		
 		return true;
 	}
 
