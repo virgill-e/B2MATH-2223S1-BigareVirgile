@@ -10,10 +10,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,6 +32,7 @@ public class DictionaryBasedAnalysis {
 	private String alphabet;
 	private Map<Integer, List<String>> wordsByLength;
 	private Map<String,String> solvedWords;
+	private int afac=0;
 
 	/*
 	 * CONSTRUCTOR
@@ -60,14 +59,14 @@ public class DictionaryBasedAnalysis {
 	 * @return The decoding alphabet at the end of the analysis process
 	 */
 	public String guessApproximatedAlphabet(String alphabet) {
+		if(alphabet.length()!=26) {
+			throw new IllegalArgumentException("the alphabet must be 26 in length");
+		}
 		int score = this.alphabetScore(this.alphabet);
 		int actualScore;
 		String actualAlphabet;
-		int boucleI = 0;
 		for (String encodedWord : encodedWords) {
 			if(solvedWords.containsKey(encodedWord))continue;
-			boucleI++;
-			System.out.println(boucleI + "/" + encodedWords.size());
 			String word = getCompatibleWord(encodedWord);
 			if(word==null)continue;
 			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase());
@@ -93,6 +92,9 @@ public class DictionaryBasedAnalysis {
 	 * @return The substituted text
 	 */
 	public static String applySubstitution(String text, String alphabet) {
+		if(!PATTERN_ALL_WORD.matcher(alphabet).matches()) {
+			throw new IllegalArgumentException("incorrect alphabet.");
+		}
 		String result = "";
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
@@ -178,6 +180,7 @@ public class DictionaryBasedAnalysis {
 	}
 
 	private int alphabetScore(String alphabet) {
+		System.out.println(afac++);
 		if (alphabet.length() != 26)
 			return 0;
 		int score = 0;
@@ -197,6 +200,9 @@ public class DictionaryBasedAnalysis {
 	}
 
 	private boolean isCompatible(String word, String encodedWord) {
+		if(!PATTERN_ALL_WORD.matcher(word).matches()) {
+			return false;
+		}
 		Map<Character, Character> correspondance=new HashMap<>();
 		word=word.toUpperCase();
 		if (encodedWord.length() != word.length()) {

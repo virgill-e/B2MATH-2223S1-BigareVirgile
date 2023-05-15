@@ -37,6 +37,8 @@ public class Boggle {
 			char letter = (char) ('a' + rand.nextInt(26));
 			grille[row][col] = new Sommet(letter);
 		}
+		setVertexGraph(grille);
+		setEdgeGraph(grille);
 
 	}
 
@@ -49,6 +51,9 @@ public class Boggle {
 	 * @param dict    A dictionary of allowed words
 	 */
 	public Boggle(int size, String letters, LexicographicTree dict) {
+		if(letters==null) {
+			throw new IllegalArgumentException("Invalid grid size or letters");
+		}
 		if (size < 1 || letters.length() < size * size) {
 			throw new IllegalArgumentException("Invalid grid size or letters");
 		}
@@ -93,6 +98,8 @@ public class Boggle {
 	 * @return true if the word is present, false otherwise
 	 */
 	public boolean contains(String word) {
+		if(word==null)return false;
+		word=word.toLowerCase();
 	    if (word == null || word.isEmpty()) {
 	        return false;
 	    }

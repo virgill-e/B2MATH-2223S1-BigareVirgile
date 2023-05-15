@@ -56,4 +56,57 @@ public class DictionaryBasedAnalysisTest {
 		}
 		return data;
 	}
+
+
+	
+	
+	// My tests
+	// Guess
+	@Test
+	void guessApproximatedAlphabetWithDecodingAlphabet() {
+		String cryptogram = readFile(CRYPTOGRAM_FILE, StandardCharsets.UTF_8);
+		DictionaryBasedAnalysis dba = new DictionaryBasedAnalysis(cryptogram, dictionary);
+		assertNotNull(dba);
+		String alphabet = dba.guessApproximatedAlphabet(DECODING_ALPHABET);
+		int score = 0;
+		for (int i = 0; i < DECODING_ALPHABET.length(); i++) {
+			if (DECODING_ALPHABET.charAt(i) == alphabet.charAt(i)) score++;
+		}
+		assertTrue(score >= 9, "Moins de 9 correspondances trouvées [" + score + "]");
+	}
+	
+	@Test
+	void guessApproximatedAlphabetShortAlphabet() {
+		// Given
+		String cryptogram = readFile(CRYPTOGRAM_FILE, StandardCharsets.UTF_8);
+		DictionaryBasedAnalysis dba = new DictionaryBasedAnalysis(cryptogram, dictionary);
+		String shortAlphabet = "AZERTYUIOP";
+		
+		// Then
+		assertThrows(IllegalArgumentException.class, () -> dba.guessApproximatedAlphabet(shortAlphabet));
+	}
+	
+	
+	
+	// Substitution
+	
+	@Test
+	void applySubstitutionTestOnArtiste() {
+		String message = "ARTISTE";
+		String encoded = "YPDFCDM";
+		assertEquals(encoded, DictionaryBasedAnalysis.applySubstitution(message, ENCODING_ALPHABET));
+		assertEquals(message, DictionaryBasedAnalysis.applySubstitution(encoded, DECODING_ALPHABET));
+	}
+	
+	@Test
+	void applySubstitutionTestShortAlphabet() {
+		String message = "ARTISTE";
+		assertThrows(IllegalArgumentException.class, () -> DictionaryBasedAnalysis.applySubstitution(message, "AZERTYUIOP"));
+	}
+	
+	@Test
+	void applySubstitutionTestBadAlphabet() {
+		String message = "ARTISTE";
+		assertThrows(IllegalArgumentException.class, () -> DictionaryBasedAnalysis.applySubstitution(message, "ABCDEFGHIJKLMNOPQRST^^158Z"));
+	}
 }
