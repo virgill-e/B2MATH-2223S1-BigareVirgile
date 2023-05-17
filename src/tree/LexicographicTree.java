@@ -1,11 +1,12 @@
 package tree;
 
-import java.io.BufferedReader;
+import java.nio.file.Paths;
 import java.io.File;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,11 +35,9 @@ public class LexicographicTree {
 		start = new Node('\0');
 		size = 0;
 		if (filename != null) {
-			try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-				String line;
-				while ((line = br.readLine()) != null) {
-					insertWord(line.trim());
-				}
+			try {
+				var list = Files.readAllLines(Paths.get(filename));
+	            list.forEach(str -> this.insertWord(str));
 			} catch (IOException e) {
 				System.err.println("Error reading file: " + e.getMessage());
 			}
