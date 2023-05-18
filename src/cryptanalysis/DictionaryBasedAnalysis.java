@@ -95,9 +95,9 @@ public class DictionaryBasedAnalysis {
 	 * @return The substituted text
 	 */
 	public static String applySubstitution(String text, String alphabet) {
-//		if(!PATTERN_ALL_WORD.matcher(alphabet).matches()) {
-//			throw new IllegalArgumentException("incorrect alphabet.");
-//		}
+		if(!PATTERN_ALL_WORD.matcher(alphabet).matches()) {
+			throw new IllegalArgumentException("incorrect alphabet.");
+		}
 		String result = "";
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
@@ -130,28 +130,33 @@ public class DictionaryBasedAnalysis {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * mets a jour un alphabet de substitution en recenvant un mot chiffré, le mot candidat et l'alphabet actuel
+	 * en inversant les lettres de l'alphabet 2 par 2
+	 * @param encoded
+	 * @param word
+	 * @param alphabet
+	 * @return
+	 */
 	private String generateAlphabet(String encoded, String word,String alphabet) {
-		//TODO: inverser les lettre et pas regen tout l'alphabet
-		Set<Character> adedLetters=new HashSet<>();
-		
+
 		char[] inverseAlphabet = new char[26];
 		for (int i = 0; i < alphabet.length(); i++) {
 			inverseAlphabet[i] = alphabet.charAt(i);
 		}
 
 		for (int i = 0; i < encoded.length(); i++) {
-			char encodedChar = encoded.charAt(i);
-			char wordChar = word.charAt(i);
-			if (LETTERS.indexOf(encodedChar + "") == -1||LETTERS.indexOf(wordChar + "") == -1)
-				continue;
-			int encodedIndex = encodedChar - 'A';
-
-			inverseAlphabet[encodedIndex] = wordChar;
+			char c = encoded.charAt(i);
+				int index = LETTERS.indexOf(c);
+				if (index != -1) {
+					inverseAlphabet[index] = word.charAt(i);
+			}
 		}
 
 		return new String(inverseAlphabet);
 	}
+
 
 	/**
 	 * Load the text file pointed to by pathname into a String.
@@ -194,11 +199,14 @@ public class DictionaryBasedAnalysis {
 
 	private String getCompatibleWord(String encodedWord) {		
 		List<String> words=this.wordsByLength.get(encodedWord.length());
+		
 		if(words==null) {
 			words=dict.getWordsOfLength(encodedWord.length());
 			this.wordsByLength.put(encodedWord.length(), words);
 		}
+		
 		for(String word:words) {
+			if(!PATTERN_ALL_WORD.matcher(word).matches())continue;
 			if(wordToCorrespondence(word).equals(wordToCorrespondence(encodedWord))) {
 				return word;
 			}
