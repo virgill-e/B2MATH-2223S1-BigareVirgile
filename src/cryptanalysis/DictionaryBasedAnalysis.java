@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,6 @@ public class DictionaryBasedAnalysis {
 
 	private List<String> encodedWords;
 	private final LexicographicTree dict;
-	private String alphabet;
 	private Map<Integer, List<String>> wordsByLength;
 	private Map<String,String> solvedWords;
 	private int afac=0;
@@ -41,7 +41,6 @@ public class DictionaryBasedAnalysis {
 		this.solvedWords=new HashMap<>();
 		this.wordsByLength = new HashMap<>();
 		this.dict = dict;
-		this.alphabet = generateRandomAlphabet();
 		this.encodedWords = new ArrayList<String>(Arrays.asList(cryptogram.split(" "))).stream()
 				.filter(word -> PATTERN_ALL_WORD.matcher(word).matches() && word.length() >= 3).map(String::trim)
 				.distinct().sorted(COMP_STRING_BY_LENGTH).collect(Collectors.toList());
@@ -62,24 +61,26 @@ public class DictionaryBasedAnalysis {
 		if(alphabet.length()!=26) {
 			throw new IllegalArgumentException("the alphabet must be 26 in length");
 		}
-		int score = this.alphabetScore(this.alphabet);
+		int score = this.alphabetScore(alphabet);
 		int actualScore;
 		String actualAlphabet;
 		for (String encodedWord : encodedWords) {
 			if(solvedWords.containsKey(encodedWord))continue;
 			String word = getCompatibleWord(encodedWord);
 			if(word==null)continue;
-			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase());
+			System.out.print(encodedWord);
+			System.out.println(word);
+			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase(),alphabet);
 			actualScore = this.alphabetScore(actualAlphabet);
 			
 			if (actualScore > score) {
 				score = actualScore;
-				this.alphabet = actualAlphabet;
+				alphabet = actualAlphabet;
 			}
 
 		}
 
-		return this.alphabet;// TODO
+		return alphabet;
 	}
 
 	
@@ -92,9 +93,9 @@ public class DictionaryBasedAnalysis {
 	 * @return The substituted text
 	 */
 	public static String applySubstitution(String text, String alphabet) {
-		if(!PATTERN_ALL_WORD.matcher(alphabet).matches()) {
-			throw new IllegalArgumentException("incorrect alphabet.");
-		}
+//		if(!PATTERN_ALL_WORD.matcher(alphabet).matches()) {
+//			throw new IllegalArgumentException("incorrect alphabet.");
+//		}
 		String result = "";
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
@@ -128,10 +129,10 @@ public class DictionaryBasedAnalysis {
 		return result;
 	}
 	
-	private String generateAlphabet(String encoded, String word) {
+	private String generateAlphabet(String encoded, String word,String alphabet) {
 		char[] inverseAlphabet = new char[26];
-		for (int i = 0; i < this.alphabet.length(); i++) {
-			inverseAlphabet[i] = this.alphabet.charAt(i);
+		for (int i = 0; i < alphabet.length(); i++) {
+			inverseAlphabet[i] = alphabet.charAt(i);
 		}
 
 		for (int i = 0; i < encoded.length(); i++) {
@@ -165,20 +166,6 @@ public class DictionaryBasedAnalysis {
 		return data;
 	}
 
-	private String generateRandomAlphabet() {
-		List<Character> shuffledAlphabet = new ArrayList<>();
-		for (int i = 0; i < LETTERS.length(); i++) {
-			shuffledAlphabet.add(LETTERS.charAt(i));
-		}
-		Collections.shuffle(shuffledAlphabet);
-
-		StringBuilder sb = new StringBuilder();
-		for (char c : shuffledAlphabet) {
-			sb.append(c);
-		}
-		return sb.toString();
-	}
-
 	private int alphabetScore(String alphabet) {
 		System.out.println(afac++);
 		if (alphabet.length() != 26)
@@ -199,27 +186,6 @@ public class DictionaryBasedAnalysis {
 		return score;
 	}
 
-	private boolean isCompatible(String word, String encodedWord) {
-		if(!PATTERN_ALL_WORD.matcher(word).matches()) {
-			return false;
-		}
-		Map<Character, Character> correspondance=new HashMap<>();
-		word=word.toUpperCase();
-		if (encodedWord.length() != word.length()) {
-			return false;
-		}
-		
-		for(int i=0;i<word.length();i++) {
-			Character wordCharacter = Character.valueOf(word.charAt(i));
-			Character encodedCharacter = Character.valueOf(encodedWord.charAt(i));
-			if(correspondance.get(wordCharacter)!=null&&correspondance.get(wordCharacter)!=encodedCharacter) {
-				return false;
-			}
-			correspondance.put(wordCharacter, encodedCharacter);
-		}
-		
-		return true;
-	}
 
 	private String getCompatibleWord(String encodedWord) {
 		List<String> words=this.wordsByLength.get(encodedWord.length());
@@ -227,12 +193,26 @@ public class DictionaryBasedAnalysis {
 			words=dict.getWordsOfLength(encodedWord.length());
 			this.wordsByLength.put(encodedWord.length(), words);
 		}
-		for (String word : words) {
-			if (isCompatible(word, encodedWord)) {
+		for(String word:words) {
+			if(wordToCorrespondence(word).equals(wordToCorrespondence(encodedWord))) {
 				return word;
 			}
 		}
 		return null;
+	}
+	
+	
+	private String wordToCorrespondence(String word) {
+		StringJoiner wordCorrespondance=new StringJoiner("");
+		Map<String, Integer> letters=new HashMap<>();
+		
+		for(String let:word.split("")) {
+			if(!letters.containsKey(let)) {
+				letters.put(let, letters.size());
+			}
+			wordCorrespondance.add(String.valueOf(letters.get(let)));
+		}
+		return wordCorrespondance.toString();
 	}
 
 	/*
