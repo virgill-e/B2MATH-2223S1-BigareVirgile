@@ -10,8 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -130,6 +132,9 @@ public class DictionaryBasedAnalysis {
 	}
 	
 	private String generateAlphabet(String encoded, String word,String alphabet) {
+		//TODO: inverser les lettre et pas regen tout l'alphabet
+		Set<Character> adedLetters=new HashSet<>();
+		
 		char[] inverseAlphabet = new char[26];
 		for (int i = 0; i < alphabet.length(); i++) {
 			inverseAlphabet[i] = alphabet.charAt(i);
@@ -138,7 +143,7 @@ public class DictionaryBasedAnalysis {
 		for (int i = 0; i < encoded.length(); i++) {
 			char encodedChar = encoded.charAt(i);
 			char wordChar = word.charAt(i);
-			if (LETTERS.indexOf(encodedChar + "") == -1)
+			if (LETTERS.indexOf(encodedChar + "") == -1||LETTERS.indexOf(wordChar + "") == -1)
 				continue;
 			int encodedIndex = encodedChar - 'A';
 
@@ -187,7 +192,7 @@ public class DictionaryBasedAnalysis {
 	}
 
 
-	private String getCompatibleWord(String encodedWord) {
+	private String getCompatibleWord(String encodedWord) {		
 		List<String> words=this.wordsByLength.get(encodedWord.length());
 		if(words==null) {
 			words=dict.getWordsOfLength(encodedWord.length());
