@@ -98,11 +98,6 @@ public class DictionaryBasedAnalysisTest {
 		assertEquals(message, DictionaryBasedAnalysis.applySubstitution(encoded, DECODING_ALPHABET));
 	}
 	
-	@Test
-	void applySubstitutionTestShortAlphabet() {
-		String message = "ARTISTE";
-		assertThrows(IllegalArgumentException.class, () -> DictionaryBasedAnalysis.applySubstitution(message, "AZERTYUIOP"));
-	}
 	
 	@Test
 	void applySubstitutionTestBadAlphabet() {

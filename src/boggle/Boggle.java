@@ -129,7 +129,7 @@ public class Boggle {
 	    Set<String> motsTrouves = new HashSet<>();
 	    Set<Sommet> vertexSet = graph.vertexSet();
 	    for (Sommet sommet : vertexSet) {
-	        dfs(sommet, "" + sommet.getLetter(), new boolean[vertexSet.size()], motsTrouves);
+	        dfs(sommet, "" + sommet.getLetter(), motsTrouves);
 	    }
 	    return motsTrouves;
 	}
@@ -207,7 +207,7 @@ public class Boggle {
 		}
 	}
 	
-	private void dfs(Sommet sommetCourant, String motCourant, boolean[] visited, Set<String> motsTrouves) {
+	private void dfs(Sommet sommetCourant, String motCourant, Set<String> motsTrouves) {
 	    sommetCourant.setVisited(true);
 	    if (arbre.containsWord(motCourant) && motCourant.length() >= 3) {
 	        motsTrouves.add(motCourant);
@@ -220,7 +220,7 @@ public class Boggle {
 	                sommetVoisin = graph.getEdgeSource(edge);
 	            }
 	            if (!sommetVoisin.isVisited()) {
-	                dfs(sommetVoisin, motCourant + sommetVoisin.getLetter(), visited, motsTrouves);
+	                dfs(sommetVoisin, motCourant + sommetVoisin.getLetter(), motsTrouves);
 	            }
 	        }
 	    }

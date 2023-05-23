@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,16 +67,17 @@ public class DictionaryBasedAnalysis {
 		String actualAlphabet;
 		for (String encodedWord : encodedWords) {
 			if(solvedWords.containsKey(encodedWord))continue;
-			String word = getCompatibleWord(encodedWord);
+			String encodedApply=applySubstitution(encodedWord, alphabet);
+			//if(dict.containsWord(encodedApply))continue;
+			String word = getCompatibleWord(encodedApply);
 			if(word==null)continue;
-			System.out.print(encodedWord);
-			System.out.println(word);
-			actualAlphabet = generateAlphabet(encodedWord, word.toUpperCase(),alphabet);
+			actualAlphabet = generateAlphabet(encodedApply, word.toUpperCase(),alphabet);
 			actualScore = this.alphabetScore(actualAlphabet);
 			
 			if (actualScore > score) {
 				score = actualScore;
 				alphabet = actualAlphabet;
+				//System.out.println(alphabet);
 			}
 
 		}
@@ -139,23 +139,68 @@ public class DictionaryBasedAnalysis {
 	 * @param alphabet
 	 * @return
 	 */
+//	private String generateAlphabet(String encoded, String word,String alphabet) {
+//
+//		char[] inverseAlphabet = new char[26];
+//		for (int i = 0; i < alphabet.length(); i++) {
+//			inverseAlphabet[i] = alphabet.charAt(i);
+//		}
+//
+//		for (int i = 0; i < encoded.length(); i++) {
+//			char c = encoded.charAt(i);
+//				int index = LETTERS.indexOf(c);
+//				if (index != -1) {
+//					inverseAlphabet[index] = word.charAt(i);
+//			}
+//		}
+//
+//		return new String(inverseAlphabet);
+//	}
+
+	/**
+	 * mets a jour un alphabet de substitution en recenvant un mot chiffré, le mot candidat et l'alphabet actuel
+	 * en inversant le position des lettres correspondate.
+	 *
+	 *
+	 *
+	 * @param encoded
+	 * @param word
+	 * @param alphabet
+	 * @return
+	 */
 	private String generateAlphabet(String encoded, String word,String alphabet) {
 
-		char[] inverseAlphabet = new char[26];
-		for (int i = 0; i < alphabet.length(); i++) {
-			inverseAlphabet[i] = alphabet.charAt(i);
-		}
+		Set<Character> set = new HashSet<>();
+		char[] actualAlphabet=alphabet.toCharArray();
+		char[] newAlphabet = new char[26];
 
 		for (int i = 0; i < encoded.length(); i++) {
-			char c = encoded.charAt(i);
-				int index = LETTERS.indexOf(c);
-				if (index != -1) {
-					inverseAlphabet[index] = word.charAt(i);
+			char wordChar = word.charAt(i);
+			char encodedChar = encoded.charAt(i);
+
+			if(set.contains(wordChar))continue;
+
+			int indexWord = alphabet.indexOf(wordChar);
+			int indexEncoded = alphabet.indexOf(encodedChar);
+
+			if(newAlphabet[indexWord]!=0||newAlphabet[indexEncoded]!=0)continue;
+
+			newAlphabet[indexEncoded] = wordChar;
+			newAlphabet[indexWord] = encodedChar;
+
+			set.add(wordChar);
+		}
+
+		for (int i = 0; i < newAlphabet.length; i++) {
+			if(newAlphabet[i]==0) {
+				newAlphabet[i]=actualAlphabet[i];
 			}
 		}
 
-		return new String(inverseAlphabet);
+		return new String(newAlphabet);
 	}
+
+	
 
 
 	/**
@@ -205,9 +250,14 @@ public class DictionaryBasedAnalysis {
 			this.wordsByLength.put(encodedWord.length(), words);
 		}
 		
+		String encodedRepetition=wordToCorrespondence(encodedWord);
+		if(encodedRepetition==null) return null;
+		
 		for(String word:words) {
 			if(!PATTERN_ALL_WORD.matcher(word).matches())continue;
-			if(wordToCorrespondence(word).equals(wordToCorrespondence(encodedWord))) {
+			String wordRepetition=wordToCorrespondence(word);
+			if(wordRepetition==null)continue;
+			if(wordRepetition.equals(encodedRepetition)) {
 				return word;
 			}
 		}
@@ -218,12 +268,19 @@ public class DictionaryBasedAnalysis {
 	private String wordToCorrespondence(String word) {
 		StringJoiner wordCorrespondance=new StringJoiner("");
 		Map<String, Integer> letters=new HashMap<>();
+		boolean repetition=false;
 		
 		for(String let:word.split("")) {
 			if(!letters.containsKey(let)) {
 				letters.put(let, letters.size());
+			}else {
+				repetition=true;
 			}
 			wordCorrespondance.add(String.valueOf(letters.get(let)));
+		}
+		
+		if(!repetition) {
+			return null;
 		}
 		return wordCorrespondance.toString();
 	}
@@ -245,15 +302,15 @@ public class DictionaryBasedAnalysis {
 		 * Load cryptogram
 		 */
 		String cryptogram = readFile(CRYPTOGRAM_FILE, StandardCharsets.UTF_8);
-//		System.out.println("*** CRYPTOGRAM ***\n" + cryptogram.substring(0, 100));
-//		System.out.println();
+		System.out.println("*** CRYPTOGRAM ***\n" + cryptogram.substring(0, 100));
+		System.out.println();
 
 		/*
 		 * Decode cryptogram
 		 */
 		DictionaryBasedAnalysis dba = new DictionaryBasedAnalysis(cryptogram, dict);
-		String startAlphabet = LETTERS;
-//		String startAlphabet = "ZISHNFOBMAVQLPEUGWXTDYRJKC"; // Random alphabet
+		//String startAlphabet = LETTERS;
+		String startAlphabet = "ZISHNFOBMAVQLPEUGWXTDYRJKC"; // Random alphabet
 		String finalAlphabet = dba.guessApproximatedAlphabet(startAlphabet);
 
 		// Display final results
