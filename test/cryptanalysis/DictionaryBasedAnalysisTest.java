@@ -104,4 +104,5 @@ public class DictionaryBasedAnalysisTest {
 		String message = "ARTISTE";
 		assertThrows(IllegalArgumentException.class, () -> DictionaryBasedAnalysis.applySubstitution(message, "ABCDEFGHIJKLMNOPQRST^^158Z"));
 	}
+	
 }

@@ -131,35 +131,9 @@ public class DictionaryBasedAnalysis {
 		return result;
 	}
 
-	/**
-	 * mets a jour un alphabet de substitution en recenvant un mot chiffré, le mot candidat et l'alphabet actuel
-	 * en inversant les lettres de l'alphabet 2 par 2
-	 * @param encoded
-	 * @param word
-	 * @param alphabet
-	 * @return
-	 */
-//	private String generateAlphabet(String encoded, String word,String alphabet) {
-//
-//		char[] inverseAlphabet = new char[26];
-//		for (int i = 0; i < alphabet.length(); i++) {
-//			inverseAlphabet[i] = alphabet.charAt(i);
-//		}
-//
-//		for (int i = 0; i < encoded.length(); i++) {
-//			char c = encoded.charAt(i);
-//				int index = LETTERS.indexOf(c);
-//				if (index != -1) {
-//					inverseAlphabet[index] = word.charAt(i);
-//			}
-//		}
-//
-//		return new String(inverseAlphabet);
-//	}
 
 	/**
 	 * mets a jour un alphabet de substitution en recenvant un mot chiffré, le mot candidat et l'alphabet actuel
-	 * en inversant le position des lettres correspondate.
 	 *
 	 *
 	 *
@@ -229,10 +203,7 @@ public class DictionaryBasedAnalysis {
 		for (String encodedword : this.encodedWords) {
 			String word=applySubstitution(encodedword, alphabet).toLowerCase();
 
-			if(this.solvedWords.get(encodedword)==word) {
-				score++;
-				continue;
-			}
+		
 			if (dict.containsWord(word)) {
 				this.solvedWords.put(encodedword,word);
 				score += 1;
