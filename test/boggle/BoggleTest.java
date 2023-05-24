@@ -23,12 +23,12 @@ public class BoggleTest {
 	private static LexicographicTree dictionary = null;
 	String grid10x10 = "eymmccsrltjttsdiraoarliuniepeousrcgoiseerreeistiedtomcteevcmkaualilaretneerectresieenspgizeoeceecuds";
 	String grid50x50 = "eymmccsrltjttsdiraoarliuniepeousrcgoiseerreeistiedtomcteevcmkaualilaretneerectresieenspgizeoeceecudsrrsrvfianrsicwtdieioeiufnidlaaeeoeieitmntleavieacalischvzeatuisiupatolauaernetasatttadvtthzraaneuzfpneenabiielhcnitesaouelsenxrtojlcastieklkrupeletaiztleapqgaeocbpteutnetrtozatluuarapepsvipesxolteatmylttumelctahsowlsadoelouamisparejpmuaasoaeszsuilubrdrannyosfewnolneudpatcrwatblttpensaaunvkslrekiittciivsomuestiurfuaxreeunuennetemubenanvsucimozentlvptnsoyaoatospesvaesasyysdlbdoraguhpleonvfrelentickiwzrnmimsaeimralovhetscejsdsnrtcsgporubtewesdklorlvteselauxieusieetfmiplllneuyprlpiiujiewverneussnnaxoaswclermderupyurmaareuescriqesbeeadldnlhtsnaucxeadstciqneeetcwtctcltavxgiiuorlomewbleeaoanrjeqeaqhzetmamisirasceranivleteeuaedeaatnsostwtbtonuasilsodhxsmnetecuoesepmotlndamvdcaeebiualneltdrtnwgerifterpepdetdbgollulneoynesonnrpesaustieundaevansmspaisinusitiaagrhoaeeewotnlagtlinjdssnocmeigvultkamnarvcloohslgiueawnyterddduepeislsmaemaiensuytiraesliehotcmaeoeovtsoiostialfertapbuptefeeleeonkeeectcdtneuidrlrpeenmeauvztltsetaeidlsrgscvlsenmetyeoueqesassooiajprrsytioqesugwvatixluutotimwlpesreeicylreeeseauueeeeapornntulivlonansipvoeeactiuecmeudnenrqaieordhluomrtsrmetetswlieqcmltslvsadeuspglmyruteoixiuoepdnectntentdaualdpcsoaeljvonkeftneiuedeeztsatencaectoeptluatriocdocrdtmudleueornptmeintlzejaaaneeradibraeaoaanpoisieeurtettrxvtneoegleltagkasosrastluadxsepnlsaadoaiepjswyedatmrsnivmriseaweinvatepciuuesssnllsssmixlesiedettssyoeuipwltetitececoieeozweaenmlaoroospptusidpkdvsrnqaajituspuuleiisheiogeinpbbsitbsvetofsncnaetaowooekmuntavroonjraduuacknoqqknnnrjoopeeofzdyseaoltsclvaaapiueceauofcdbntmxtneetpoitwiinfaeltgueeispzeacneqmviaiusaettplhiuaetqaewtfuuipoueuesnsoxaixaeeyavqllssqareessnmeolsetlvttbpbeoosesiuincpnersriiterrincnhsemaunvaseeueprldkiecnwtisultmmenensaojgidntetselyzagtctaisiraipzegeienjreosuuszuynlnpooesurddauuuitnouspiiuaeeqerelumdalnohdhueuuiiaiaaltlunnsnamleoprecysucviuirsatenctssjeniinreuenvirsntrwzntaeeieouapntlmayotrpsuunnuiptsxaevplkmuruasocuimontijceksmaeaaearurosaeitpimvtityevsualpsosallkkimiaaievplozjirncedcismssamnerotsprnltlhfiokolroleeaejexjslihseaoelqnsrwizluirhuraarefssdsealtkuediqtdpwekselinealineozeremtjandnrerracqoakiltrcsnwataavalommuslrdqawqpcneaiotajsaiedrkoxtasfyvermeyrnaibrdeiixlefsesvsqrlobkatcptiuxpmvanohcedlemkgevsuoexjjmenoteatptylewesoeotzbveiugseaswoeueoirpupdpulsidsiosueeealdepeltuwssipsecinicloeantylscemtsbairodutathtceeutmrsiarnptamasrrildiuwntaisaatculursrgeierrheeiteacuroruyfretvcxegadiiunguenunubreuflnccretdeetwmdunttrosyntooieeeutvenra";
-
+	private static Boggle boggle4X4;
+	
 	@BeforeAll
 	public static void initTestDictionary() {
-		System.out.print("Loading dictionary...");
 		dictionary = new LexicographicTree("mots/dictionnaire_FR_sans_accents.txt");
-		System.out.println(" done.");
+		boggle4X4 = new Boggle(4, GRID_LETTERS, dictionary);
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class BoggleTest {
 		// solve
 		assertEquals(new TreeSet<String>(Arrays.asList("sega", "sage")), b.solve());
 
-		assertEquals("s g \ne a \n", b.toString());
+		assertEquals("s g\ne a\n", b.toString());
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class BoggleTest {
 
 		assertEquals(new TreeSet<String>(Arrays.asList("art", "rat", "rate")), b.solve());
 
-		assertEquals("a r \nt e \n", b.toString());
+		assertEquals("a r\nt e\n", b.toString());
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class BoggleTest {
 
 		assertEquals(new TreeSet<String>(expected), b.solve());
 
-		assertEquals("m s s n \ny t s s \nt u e f \ng r e r \n", b.toString());
+		assertEquals("m s s n\ny t s s\nt u e f\ng r e r\n", b.toString());
 	}
 
 	@Test
@@ -362,5 +362,251 @@ public class BoggleTest {
 		// Then
 		assertEquals(100, counter);
 	}
+	
+
+
+
+	@Test
+	void createBoggleSpecifyingLettersWithIncorrectSize(){
+		String letter = "rhreypcswnsntegomlkkdnqmlksqnmlnqdsmlnqsdlmndqlmdnlqs";
+		assertThrows(IllegalArgumentException.class, () -> new Boggle(-3,letter, dictionary));
+		assertThrows(IllegalArgumentException.class, () -> new Boggle(0,letter, dictionary));
+	}
+
+	@Test
+	void createBoggleNoSpecifyingLettersWithIncorrectSize(){
+		assertThrows(IllegalArgumentException.class, () -> new Boggle(-3, dictionary));
+		assertThrows(IllegalArgumentException.class, () -> new Boggle(0, dictionary));
+	}
+
+	@Test
+	void createBoggleWithNullLetters(){
+		assertThrows(IllegalArgumentException.class, () -> new Boggle(4, null, dictionary));
+	}
+
+	@Test
+	void createBoggleWithEmptyLetters(){
+		assertThrows(IllegalArgumentException.class, () -> new Boggle(4, "", dictionary));
+	}
+
+
+
+
+
+
+
+	// letters();
+	@Test
+	public void getLetterFromBoggleGrid(){
+		String letters = boggle4X4.letters();
+		String expectedLetters = "rhreypcswnsntego";
+		assertEquals(expectedLetters, letters);
+	}
+
+	//Contains
+	@Test
+	public void containsUnexpectedWord(){
+		assertFalse(boggle4X4.contains("hello"));
+	}
+
+	@Test
+	public void containsEmptyWord(){
+		assertFalse(boggle4X4.contains(""));
+	}
+
+	@Test
+	public void containsNullWord(){
+		assertFalse(boggle4X4.contains(null));
+	}
+
+	@Test
+	public void containsWordWithSpaces(){
+		assertFalse(boggle4X4.contains("sons fort"));
+	}
+
+	@Test
+	public void containsWordWithSpecialCharacters(){
+		assertFalse(boggle4X4.contains("sons!"));
+		assertFalse(boggle4X4.contains("céder"));
+		assertFalse(boggle4X4.contains("trône"));
+	}
+
+	@Test
+	public void containsWordWithNumbers(){
+		assertFalse(boggle4X4.contains("sons1"));
+	}
+
+	@Test
+	public void containsWordWithUpperCase(){
+		assertTrue(boggle4X4.contains("SONS"));//Car, je fais un toLowerCase au niveau de contains dans la classe Boggle avec utils.StringUtils
+	}
+
+	@Test
+	public void containsWordWithLowerCase(){
+		assertTrue(boggle4X4.contains("sons"));
+	}
+
+	@Test
+	public void containsWordWithMixedCase(){
+		assertTrue(boggle4X4.contains("sOnS"));
+	}//Car, je fais un toLowerCase au niveau de contains dans la classe Boggle avec utils.StringUtils
+
+	@Test
+	public void containsWordWithNonAdjacentLetters(){
+		assertFalse(boggle4X4.contains("sont"));
+	}
+
+	@Test
+	public void containsWordWithAdjacentLetters(){
+		assertTrue(boggle4X4.contains("cesse"));
+		assertTrue(boggle4X4.contains("ces"));
+		for(String word :EXPECTED_WORDS){
+			assertTrue(boggle4X4.contains(word));
+		}
+	}
+
+	@Test
+	public void containsWordByUsingMultipleTimeASameVertex(){
+		assertFalse(boggle4X4.contains("ses"));//s[1,3] => e[0,3] => s[1,3] || s[2,2] => e[0,3] => s[2,2] || s[2,2] => e[3,1] => s[2,2]
+	}
+
+	//Solve
+
+	@Test
+	void solveBoggle4x4(){
+		Set<String> words = boggle4X4.solve();
+		assertEquals(EXPECTED_WORDS.size(), words.size());
+		assertTrue(words.containsAll(EXPECTED_WORDS));
+		assertTrue(EXPECTED_WORDS.containsAll(words));
+	}
+
+	@Test
+	void solveBoggleNonexistentWordInDictionary() {
+		Set<String> words = boggle4X4.solve();
+		assertFalse(words.contains("hello"));
+		assertFalse(words.contains("Anticonstitutionnellement"));
+	}
+
+	@Test
+	void solveBoggleDoesNotContainsWordWithLengthLowerThan3(){
+		Set<String> words = boggle4X4.solve();
+		assertFalse(words.contains("ci"));//Ci is a word in the dictionnary but it's length is lower than 3
+	}
+
+	/**
+	 * s s s
+	 * s e s
+	 * s s s => ses => pleins de possibilités
+	 */
+	@Test
+	void solveBoggleWithDifferentWaysToWriteAWord(){
+		String letter = "ssssessss";
+		Boggle boggle = new Boggle(3, letter, dictionary);
+		Set<String> words = boggle.solve();
+		assertTrue(words.contains("ses"));
+		assertEquals(1, words.size());
+	}
+
+	@Test
+
+	void solveGridWithSize1(){
+		String grid = "a";
+		Boggle boggle = new Boggle(1, grid, dictionary);
+		Set<String> words = boggle.solve();
+		assertEquals(words.size(),0);
+		assertFalse(boggle.contains("a"));
+	}
+
+
+
+
+
+	@Test
+	void toStringBoggle4x4(){
+		String expectedString ="";
+		expectedString += "r h r e\ny p c s\nw n s n\nt e g o\n";
+		assertEquals(expectedString, boggle4X4.toString());
+	}
+	
+	
+	// CONSTRUCTOR TESTS
+		@Test
+		void constructAGrid() {
+			// GIVEN
+			int size = 4;
+
+			// WHEN
+			Boggle grid = new Boggle(size,GRID_LETTERS, dictionary);
+
+			// THEN
+			String result = "r h r e\n"
+					+ "y p c s\n"
+					+ "w n s n\n"
+					+ "t e g o\n";
+			assertEquals(result, grid.toString());
+		}
+
+
+		@Test
+		void throwsIllegalArgumentExceptionIfSizeIsSmallerThanOne() {
+			// GIVEN
+			int size = 0;
+
+			// EXPECT
+			assertThrows(IllegalArgumentException.class, () -> {
+				new Boggle(size, dictionary);
+			});
+		}
+
+
+		@Test
+		void throwsIllegalArgumentExceptionIfLettersSizeIsTooSmall() {
+			// GIVEN
+			int size = 4;
+
+			// EXPECT
+			assertThrows(IllegalArgumentException.class, () -> {
+				new Boggle(size, "OUPS", dictionary);
+			});
+		}
+
+		// CONTAINS TESTS
+		@Test
+		void containsWord() {
+			// GIVEN
+			Boggle b = new Boggle(4, GRID_LETTERS, dictionary);
+
+			// EXPECT
+			assertTrue(b.contains("songent"));
+		}
+
+		@Test
+		void doesNotContainWord() {
+			// GIVEN
+			Boggle b = new Boggle(4, GRID_LETTERS, dictionary);
+
+			// EXPECT
+			assertFalse(b.contains("confidentiellement"));
+		}
+
+		@Test
+		void throwsNullPointerExceptionIfWordIsNull() {
+			// GIVEN
+			Boggle b = new Boggle(4, GRID_LETTERS, dictionary);
+
+			// EXPECT
+			assertFalse(b.contains(null));
+		}
+
+		// LETTERS TESTS
+		@Test
+		void returnsLetters() {
+			// GIVEN
+			Boggle b = new Boggle(4, GRID_LETTERS, dictionary);
+
+			// EXPECT
+			assertEquals(16, b.letters().length());
+			assertEquals(GRID_LETTERS, b.letters());
+		}
 
 }

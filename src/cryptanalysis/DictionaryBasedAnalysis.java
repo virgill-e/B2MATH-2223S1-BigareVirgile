@@ -32,14 +32,13 @@ public class DictionaryBasedAnalysis {
 	private List<String> encodedWords;
 	private final LexicographicTree dict;
 	private Map<Integer, List<String>> wordsByLength;
-	private Map<String,String> solvedWords;
-	private int afac=0;
+	private Map<String, String> solvedWords;
 
 	/*
 	 * CONSTRUCTOR
 	 */
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
-		this.solvedWords=new HashMap<>();
+		this.solvedWords = new HashMap<>();
 		this.wordsByLength = new HashMap<>();
 		this.dict = dict;
 		this.encodedWords = new ArrayList<String>(Arrays.asList(cryptogram.split(" "))).stream()
@@ -59,33 +58,35 @@ public class DictionaryBasedAnalysis {
 	 * @return The decoding alphabet at the end of the analysis process
 	 */
 	public String guessApproximatedAlphabet(String alphabet) {
-		if(alphabet.length()!=26) {
+		if (alphabet==null||alphabet.length() != 26||!checkAlphabet(alphabet)) {
 			throw new IllegalArgumentException("the alphabet must be 26 in length");
 		}
+	
+		alphabet = alphabet.toUpperCase();
 		int score = this.alphabetScore(alphabet);
 		int actualScore;
 		String actualAlphabet;
 		for (String encodedWord : encodedWords) {
-			if(solvedWords.containsKey(encodedWord))continue;
-			String encodedApply=applySubstitution(encodedWord, alphabet);
-			//if(dict.containsWord(encodedApply))continue;
+			if (solvedWords.containsKey(encodedWord))
+				continue;
+			String encodedApply = applySubstitution(encodedWord, alphabet);
+			// if(dict.containsWord(encodedApply))continue;
 			String word = getCompatibleWord(encodedApply);
-			if(word==null)continue;
-			actualAlphabet = generateAlphabet(encodedApply, word.toUpperCase(),alphabet);
+			if (word == null)
+				continue;
+			actualAlphabet = generateAlphabet(encodedApply, word.toUpperCase(), alphabet);
 			actualScore = this.alphabetScore(actualAlphabet);
-			
+
 			if (actualScore > score) {
 				score = actualScore;
 				alphabet = actualAlphabet;
-				//System.out.println(alphabet);
+				// System.out.println(alphabet);
 			}
 
 		}
 
 		return alphabet;
 	}
-
-	
 
 	/**
 	 * Applies an alphabet-specified substitution to a text.
@@ -95,9 +96,17 @@ public class DictionaryBasedAnalysis {
 	 * @return The substituted text
 	 */
 	public static String applySubstitution(String text, String alphabet) {
-		if(!PATTERN_ALL_WORD.matcher(alphabet).matches()) {
+		if (alphabet == null || !PATTERN_ALL_WORD.matcher(alphabet).matches() || alphabet.length() != 26)
 			throw new IllegalArgumentException("incorrect alphabet.");
+
+		if (!checkAlphabet(alphabet))
+			throw new IllegalArgumentException("incorrect alphabet.");
+
+		if (text == null) {
+			throw new IllegalArgumentException("incorrect text.");
+
 		}
+
 		String result = "";
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
@@ -131,9 +140,9 @@ public class DictionaryBasedAnalysis {
 		return result;
 	}
 
-
 	/**
-	 * mets a jour un alphabet de substitution en recenvant un mot chiffré, le mot candidat et l'alphabet actuel
+	 * mets a jour un alphabet de substitution en recenvant un mot chiffré, le mot
+	 * candidat et l'alphabet actuel
 	 *
 	 *
 	 *
@@ -142,22 +151,24 @@ public class DictionaryBasedAnalysis {
 	 * @param alphabet
 	 * @return
 	 */
-	private String generateAlphabet(String encoded, String word,String alphabet) {
+	private String generateAlphabet(String encoded, String word, String alphabet) {
 
 		Set<Character> set = new HashSet<>();
-		char[] actualAlphabet=alphabet.toCharArray();
+		char[] actualAlphabet = alphabet.toCharArray();
 		char[] newAlphabet = new char[26];
 
 		for (int i = 0; i < encoded.length(); i++) {
 			char wordChar = word.charAt(i);
 			char encodedChar = encoded.charAt(i);
 
-			if(set.contains(wordChar))continue;
+			if (set.contains(wordChar))
+				continue;
 
 			int indexWord = alphabet.indexOf(wordChar);
 			int indexEncoded = alphabet.indexOf(encodedChar);
 
-			if(newAlphabet[indexWord]!=0||newAlphabet[indexEncoded]!=0)continue;
+			if (newAlphabet[indexWord] != 0 || newAlphabet[indexEncoded] != 0)
+				continue;
 
 			newAlphabet[indexEncoded] = wordChar;
 			newAlphabet[indexWord] = encodedChar;
@@ -166,16 +177,13 @@ public class DictionaryBasedAnalysis {
 		}
 
 		for (int i = 0; i < newAlphabet.length; i++) {
-			if(newAlphabet[i]==0) {
-				newAlphabet[i]=actualAlphabet[i];
+			if (newAlphabet[i] == 0) {
+				newAlphabet[i] = actualAlphabet[i];
 			}
 		}
 
 		return new String(newAlphabet);
 	}
-
-	
-
 
 	/**
 	 * Load the text file pointed to by pathname into a String.
@@ -196,64 +204,93 @@ public class DictionaryBasedAnalysis {
 	}
 
 	private int alphabetScore(String alphabet) {
-		System.out.println(afac++);
 		if (alphabet.length() != 26)
 			return 0;
 		int score = 0;
 		for (String encodedword : this.encodedWords) {
-			String word=applySubstitution(encodedword, alphabet).toLowerCase();
+			String word = applySubstitution(encodedword, alphabet).toLowerCase();
 
-		
 			if (dict.containsWord(word)) {
-				this.solvedWords.put(encodedword,word);
+				this.solvedWords.put(encodedword, word);
 				score += 1;
 			}
 		}
 		return score;
 	}
 
+	private String getCompatibleWord(String encodedWord) {
+		List<String> words = this.wordsByLength.get(encodedWord.length());
 
-	private String getCompatibleWord(String encodedWord) {		
-		List<String> words=this.wordsByLength.get(encodedWord.length());
-		
-		if(words==null) {
-			words=dict.getWordsOfLength(encodedWord.length());
+		if (words == null) {
+			words = dict.getWordsOfLength(encodedWord.length());
 			this.wordsByLength.put(encodedWord.length(), words);
 		}
-		
-		String encodedRepetition=wordToCorrespondence(encodedWord);
-		if(encodedRepetition==null) return null;
-		
-		for(String word:words) {
-			if(!PATTERN_ALL_WORD.matcher(word).matches())continue;
-			String wordRepetition=wordToCorrespondence(word);
-			if(wordRepetition==null)continue;
-			if(wordRepetition.equals(encodedRepetition)) {
+
+		String encodedRepetition = wordToCorrespondence(encodedWord);
+		if (encodedRepetition == null)
+			return null;
+
+		for (String word : words) {
+			if (!PATTERN_ALL_WORD.matcher(word).matches())
+				continue;
+			String wordRepetition = wordToCorrespondence(word);
+			if (wordRepetition == null)
+				continue;
+			if (wordRepetition.equals(encodedRepetition)) {
 				return word;
 			}
 		}
 		return null;
 	}
-	
-	
+
 	private String wordToCorrespondence(String word) {
-		StringJoiner wordCorrespondance=new StringJoiner("");
-		Map<String, Integer> letters=new HashMap<>();
-		boolean repetition=false;
-		
-		for(String let:word.split("")) {
-			if(!letters.containsKey(let)) {
+		StringJoiner wordCorrespondance = new StringJoiner("");
+		Map<String, Integer> letters = new HashMap<>();
+		boolean repetition = false;
+
+		for (String let : word.split("")) {
+			if (!letters.containsKey(let)) {
 				letters.put(let, letters.size());
-			}else {
-				repetition=true;
+			} else {
+				repetition = true;
 			}
 			wordCorrespondance.add(String.valueOf(letters.get(let)));
 		}
-		
-		if(!repetition) {
+
+		if (!repetition) {
 			return null;
 		}
 		return wordCorrespondance.toString();
+	}
+
+	public static boolean checkAlphabet(String str) {
+		// Convertir la chaîne en minuscules pour une comparaison sans distinction de
+		// cas
+		str = str.toLowerCase();
+
+		// Tableau de booléens pour suivre les lettres de l'alphabet
+		boolean[] letters = new boolean[26];
+
+		// Parcourir la chaîne de caractères
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+
+			// Vérifier si le caractère est une lettre de l'alphabet
+			if (Character.isLetter(c)) {
+				// Marquer la lettre dans le tableau de booléens
+				int index = c - 'a'; // Calculer l'index de la lettre dans le tableau
+				letters[index] = true;
+			}
+		}
+
+		// Vérifier si toutes les lettres de l'alphabet sont présentes
+		for (boolean letter : letters) {
+			if (!letter) {
+				return false; // Au moins une lettre est manquante
+			}
+		}
+
+		return true; // Toutes les lettres sont présentes
 	}
 
 	/*
@@ -280,7 +317,7 @@ public class DictionaryBasedAnalysis {
 		 * Decode cryptogram
 		 */
 		DictionaryBasedAnalysis dba = new DictionaryBasedAnalysis(cryptogram, dict);
-		//String startAlphabet = LETTERS;
+		// String startAlphabet = LETTERS;
 		String startAlphabet = "ZISHNFOBMAVQLPEUGWXTDYRJKC"; // Random alphabet
 		String finalAlphabet = dba.guessApproximatedAlphabet(startAlphabet);
 

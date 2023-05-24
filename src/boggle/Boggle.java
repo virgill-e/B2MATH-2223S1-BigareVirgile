@@ -27,6 +27,9 @@ public class Boggle {
 		if (size < 1) {
 			throw new IllegalArgumentException("Size must be greater than 0.");
 		}
+		if(dict==null) {
+			throw new IllegalArgumentException("null pointer exception");
+		}
 		this.graph = new DefaultUndirectedGraph<>(DefaultEdge.class);
 		Sommet[][] grille = new Sommet[size][size];
 
@@ -148,11 +151,11 @@ public class Boggle {
 		int gridSize = (int) Math.sqrt(vertexSet.size());
 		int i = 0;
 		for (Sommet sommet : vertexSet) {
-			sb.append(sommet.getLetter()).append(" ");
+			sb.append(sommet.getLetter());
 			i++;
 			if (i % gridSize == 0) {
 				sb.append("\n");
-			}
+			}else sb.append(' ');
 		}
 
 		return sb.toString();

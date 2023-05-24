@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class LexicographicTree {
+		
 	private Node start;
 	private int size;
 	/*
@@ -38,8 +39,7 @@ public class LexicographicTree {
 				var list = Files.readAllLines(Paths.get(filename));
 	            list.forEach(str -> this.insertWord(str));
 			} catch (IOException e) {
-				System.err.println("Error reading file: " + e.getMessage());
-			}
+				System.err.println("Error reading file: " + e.getMessage());			}
 		}
 	}
 
@@ -62,7 +62,7 @@ public class LexicographicTree {
 	 * @param word A word
 	 */
 	public void insertWord(String word) {
-		if (word.isEmpty())
+		if (word==null||word.isEmpty()||word.isBlank())
 			return;
 		if (this.containsWord(word))
 			return;
@@ -88,6 +88,7 @@ public class LexicographicTree {
 	 * @return The list of words starting with the supplied prefix
 	 */
 	public List<String> getWords(String prefix) {
+		prefix=prefix.trim();
 		List<String> words = new ArrayList<>();
 		Node node = getNodePrefix(prefix);
 		getAllWord(node, words, prefix);
