@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 
 import tree.LexicographicTree;
 
+/**
+ * classe effectuant la cryptanalyse
+ * @author virgi
+ *
+ */
 public class DictionaryBasedAnalysis {
 
 	private static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -29,13 +34,20 @@ public class DictionaryBasedAnalysis {
 	private static final Pattern PATTERN_ALL_WORD = Pattern.compile("(\\w+)");
 	private static final Comparator<String> COMP_STRING_BY_LENGTH = (word1, word2) -> word2.length() - word1.length();
 
-	private List<String> encodedWords;
+	private final List<String> encodedWords;
 	private final LexicographicTree dict;
-	private Map<Integer, List<String>> wordsByLength;
-	private Map<String, String> solvedWords;
+	private final Map<Integer, List<String>> wordsByLength;
+	private final Map<String, String> solvedWords;
 
 	/*
 	 * CONSTRUCTOR
+	 * 
+	 */
+	
+	/**
+	 * constucteur du DictionaryBasedAnalysis recevant le cryptogram et le dictionnaire
+	 * @param cryptogram
+	 * @param dict
 	 */
 	public DictionaryBasedAnalysis(String cryptogram, LexicographicTree dict) {
 		this.solvedWords = new HashMap<>();
@@ -57,12 +69,12 @@ public class DictionaryBasedAnalysis {
 	 * @param alphabet The decoding alphabet from which the analysis starts
 	 * @return The decoding alphabet at the end of the analysis process
 	 */
-	public String guessApproximatedAlphabet(String alphabet) {
-		if (alphabet==null||alphabet.length() != 26||!checkAlphabet(alphabet)) {
+	public String guessApproximatedAlphabet(String givenAlphabet) {
+		if (givenAlphabet==null||givenAlphabet.length() != 26||!checkAlphabet(givenAlphabet)) {
 			throw new IllegalArgumentException("the alphabet must be 26 in length");
 		}
 	
-		alphabet = alphabet.toUpperCase();
+		String alphabet = givenAlphabet.toUpperCase();
 		int score = this.alphabetScore(alphabet);
 		int actualScore;
 		String actualAlphabet;
@@ -109,11 +121,11 @@ public class DictionaryBasedAnalysis {
 
 		String result = "";
 		for (int i = 0; i < text.length(); i++) {
-			char c = text.charAt(i);
-			if (c == ' ' || c == '\n') {
-				result += c;
+			char character = text.charAt(i);
+			if (character == ' ' || character == '\n') {
+				result += character;
 			} else {
-				int index = LETTERS.indexOf(c);
+				int index = LETTERS.indexOf(character);
 				if (index != -1) {
 					result += alphabet.charAt(index);
 				}
@@ -262,41 +274,39 @@ public class DictionaryBasedAnalysis {
 		}
 		return wordCorrespondance.toString();
 	}
+	
+	/**
+	 * verifie si le String fournit est un alphabet correctement constitué
+	 * @param givenAlphabet
+	 * @return
+	 */
+	public static boolean checkAlphabet(String givenAlphabet) {
+		String alphabet = givenAlphabet.toLowerCase();
 
-	public static boolean checkAlphabet(String str) {
-		// Convertir la chaîne en minuscules pour une comparaison sans distinction de
-		// cas
-		str = str.toLowerCase();
 
-		// Tableau de booléens pour suivre les lettres de l'alphabet
-		boolean[] letters = new boolean[26];
+		//boolean[] letters = new boolean[26];
+		Set<Character> letters=new HashSet<>();
 
-		// Parcourir la chaîne de caractères
-		for (int i = 0; i < str.length(); i++) {
-			char c = str.charAt(i);
+		for (int i = 0; i < alphabet.length(); i++) {
+			char character = alphabet.charAt(i);
 
-			// Vérifier si le caractère est une lettre de l'alphabet
-			if (Character.isLetter(c)) {
-				// Marquer la lettre dans le tableau de booléens
-				int index = c - 'a'; // Calculer l'index de la lettre dans le tableau
-				letters[index] = true;
+			if (Character.isLetter(character)) {
+				letters.add(Character.valueOf(character));				
+			}else {
+				return false;
 			}
 		}
 
-		// Vérifier si toutes les lettres de l'alphabet sont présentes
-		for (boolean letter : letters) {
-			if (!letter) {
-				return false; // Au moins une lettre est manquante
-			}
-		}
-
-		return true; // Toutes les lettres sont présentes
+		return letters.size()==26;
 	}
 
 	/*
 	 * MAIN PROGRAM
 	 */
-
+	/**
+	 * main
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		/*
 		 * Load dictionary

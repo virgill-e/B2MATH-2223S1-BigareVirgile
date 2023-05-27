@@ -11,6 +11,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * class d'un arbre lexicographique
+ * @author virgi
+ *
+ */
 public class LexicographicTree {
 		
 	private Node start;
@@ -87,8 +92,8 @@ public class LexicographicTree {
 	 * @param prefix Expected prefix
 	 * @return The list of words starting with the supplied prefix
 	 */
-	public List<String> getWords(String prefix) {
-		prefix=prefix.trim();
+	public List<String> getWords(String givenPrefix) {
+		String prefix=givenPrefix.trim();
 		List<String> words = new ArrayList<>();
 		Node node = getNodePrefix(prefix);
 		getAllWord(node, words, prefix);
@@ -96,28 +101,8 @@ public class LexicographicTree {
 		return words;
 	}
 
-	/**
-	 * renvoie -1 si aucun mot derive du prefix, 0 si des mots derive du prefix, et
-	 * 1 si un/des mots derivent du prefix et la derniere lettre est final
-	 * 
-	 * @param prefix
-	 * @return
-	 */
-	public int checkIfGetWordAndFinal(String prefix) {
-		int rep=-1;
-		List<String> words = new ArrayList<>();
-		Node node = getNodePrefix(prefix);
-		getAllWord(node, words, prefix);
-		Collections.sort(words);
-		if(!words.isEmpty())rep++;
-		if(node!=null&&node.isFinal())rep++;
-		
-		return rep;
-	}
 
-	public Node getStart() {
-		return this.start;
-	}
+
 
 	/**
 	 * Returns an alphabetic list of all words of a given length. If 'length' is
@@ -175,6 +160,11 @@ public class LexicographicTree {
 
 	}
 	
+	/**
+	 * renvoie si il existe au moins un mot a partir du prefix
+	 * @param prefix
+	 * @return
+	 */
 	public boolean isPrefix(String prefix) {
 		if(prefix==null)return false;
 		Node node=getNodePrefix(prefix);
